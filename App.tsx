@@ -7,6 +7,11 @@ const Stack = createNativeStackNavigator();
 import Root from "./screens/root";
 import Login from "./screens/login";
 import Main from "./screens/main";
+import Chat from "./screens/chat";
+import Call from "./screens/call";
+import Welcome from "./screens/login/welcome";
+import AddFriend from "./screens/main/addFriend";
+import SignUp from "./screens/login/SignUp";
 
 // Default react component to export
 export default () => (
@@ -26,6 +31,31 @@ export default () => (
         name="Main"
         component={Main}
         options={{ headerShown: false, gestureEnabled: false }}
+      />
+      <Stack.Screen
+        name="Chat"
+        component={Chat}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Call"
+        component={Call}
+        options={{ headerShown: false, gestureEnabled: false }}
+      />
+      <Stack.Screen
+        name="Welcome"
+        component={Welcome}
+        options={{ headerShown: false, presentation: "modal" }}
+      />
+      <Stack.Screen
+        name="SignUp"
+        component={SignUp}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AddFriend"
+        component={AddFriend}
+        options={{ headerShown: false, presentation: "modal" }}
       />
     </Stack.Navigator>
   </NavigationContainer>
