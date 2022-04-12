@@ -4,7 +4,6 @@ export async function setData(
   data: object | string,
   key: string
 ): Promise<void> {
-  const type = typeof data;
   const dataToSave = JSON.stringify(data);
   await AsyncStorage.setItem(key, dataToSave);
 }
