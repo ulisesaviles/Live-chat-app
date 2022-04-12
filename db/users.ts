@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
+  signOut,
 } from "firebase/auth";
 
 // Import db
@@ -13,10 +14,6 @@ import { firestore, auth } from "../config/firebase";
 
 // Import user interface
 import { User } from "../interfaces";
-
-// Avoid AsyncStorage alerts
-import { LogBox } from "react-native";
-LogBox.ignoreAllLogs(true);
 
 // User related functions
 export async function createUser(
@@ -48,9 +45,13 @@ export async function createUser(
   }
 }
 
-export async function signIn(email: string, password: string): Promise<User> {
+export async function userSignIn(
+  email: string,
+  password: string
+): Promise<User> {
   let user: User = {
     isLogedIn: false,
+    userId: "",
   };
   try {
     const userCredential = await signInWithEmailAndPassword(
@@ -59,7 +60,6 @@ export async function signIn(email: string, password: string): Promise<User> {
       password
     );
     user = {
-      ...user,
       ...(await getUserDoc(userCredential.user.uid)),
       isLogedIn: true,
     };
@@ -71,15 +71,16 @@ export async function signIn(email: string, password: string): Promise<User> {
   }
 }
 
+type callBack = (userId: string) => void;
 export async function createAuthListener(
-  IfUserLogedInCallBack: Function,
-  IfUserNotLogedInCallBack: Function
+  IfUserLogedInCallBack: callBack,
+  IfUserNotLogedInCallBack: callBack
 ): Promise<void> {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       IfUserLogedInCallBack(user.uid);
     } else {
-      IfUserNotLogedInCallBack();
+      IfUserNotLogedInCallBack("");
     }
   });
 }
@@ -101,4 +102,8 @@ export async function getUserDoc(userId: string): Promise<User> {
     ...document.data(),
   };
   return user;
+}
+
+export async function userSignOut(): Promise<void> {
+  await signOut(auth);
 }
