@@ -161,7 +161,7 @@ export default () => {
       opacity: 0.5,
     },
     login: {
-      color: colors[getColorScheme()].font.primary,
+      color: "white",
       fontSize: 22,
       fontWeight: "500",
     },
