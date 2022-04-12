@@ -8,6 +8,8 @@ import {
   useColorScheme,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+
+// Expo imports
 import { StatusBar } from "expo-status-bar";
 
 // Theme
@@ -42,6 +44,7 @@ export default () => {
       },
       () => {
         console.log("Signed out.");
+        navigation.navigate("Root");
         navigation.navigate("Login");
       }
     );
