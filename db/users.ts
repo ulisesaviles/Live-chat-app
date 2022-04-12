@@ -46,6 +46,9 @@ export async function createUser(
     // Create document in firestore
     await setDoc(doc(firestore, "users", userId), user);
 
+    // Actually sign in using firebase auth
+    await signInWithEmailAndPassword(auth, email, password);
+
     // Add fields  when loged in
     user.isLogedIn = true;
     user.userId = userId;
@@ -84,6 +87,9 @@ export async function userSignIn(
       ...(await getUserDoc(userCredential.user.uid)),
       isLogedIn: true,
     };
+
+    // Store user
+    await setData(user, "user");
   } catch (e) {
     // Catch errors
     console.log(e);
