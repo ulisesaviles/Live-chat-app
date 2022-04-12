@@ -39,5 +39,6 @@ export default {
       appId: process.env.APP_ID,
       measurementId: process.env.MEASUREMENT_ID,
     },
+    userInterfaceStyle: "automatic",
   },
 };
