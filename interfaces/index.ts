@@ -1,3 +1,7 @@
+// Import types
+import { messageType } from "../types";
+
+// Actual interfaces:
 // User interface
 export interface User {
   name?: string;
@@ -11,7 +15,6 @@ export interface User {
 }
 
 // Message interface (to be contained in chats)
-type messageType = "img" | "txt";
 export interface Message {
   id: number;
   type: messageType;
