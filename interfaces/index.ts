@@ -17,12 +17,11 @@ export interface Message {
   type: messageType;
   pictureUrl?: string;
   senderId: string;
+  text?: string;
 }
 
 // Chat interface
 export interface Chat {
   messages: Message[];
-  info: {
-    usersIds: string[];
-  };
+  usersIds: string[];
 }
