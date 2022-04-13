@@ -1,6 +1,7 @@
 export default {
   dark: {
     background: "rgb(6,12,16)",
+    card: "rgb(18, 25, 32)",
     font: {
       primary: "rgb(251, 251, 251)",
       secondary: "rgb(180, 180, 180)",
@@ -23,7 +24,8 @@ export default {
     },
   },
   light: {
-    background: "rgb(255,255,255)",
+    background: "rgb(245,245,245)",
+    card: "rgb(255,255,255)",
     font: {
       primary: "rgb(0, 0, 0)",
       secondary: "rgb(125, 125, 125)",
