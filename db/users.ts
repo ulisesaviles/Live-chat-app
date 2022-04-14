@@ -1,5 +1,6 @@
 // Firestore (data base's) imports
 import { setDoc, doc, updateDoc, getDoc } from "firebase/firestore";
+import { uploadBytesResumable, ref, getDownloadURL } from "firebase/storage";
 
 // Auth imports
 import {
@@ -10,7 +11,7 @@ import {
 } from "firebase/auth";
 
 // Import db
-import { firestore, auth } from "../config/firebase";
+import { firestore, auth, storage } from "../config/firebase";
 
 // Import user interface
 import { User } from "../interfaces";
@@ -150,4 +151,44 @@ export async function getUserDoc(userId: string): Promise<User> {
 // Sign out
 export async function userSignOut(): Promise<void> {
   await signOut(auth);
+}
+
+//Change profile picture
+export async function changeProfilePic(userId: string, uri: string): Promise<any> {
+  try {
+    // Here we transform our uri into a blob image
+    let res: any = await fetch(uri);
+    const blob = await res.blob();
+    let user;
+
+    // Then we get the reference of WHERE exactly in our bucket we want to store the image
+    const storageRef = ref(storage, `profilePictures/${userId}`);
+
+    // Then we create our job
+    const uploadTask = uploadBytesResumable(storageRef, blob);
+    
+    // When executing our opload
+    uploadTask.on(
+      "state_changed",
+      // Here we can see our upload progress
+      (snapshot: any) => {
+      },
+      // Here we will log the error in case we got any
+      (error: any) => console.log(error),
+      // Then, when we know everything went great, we will create a download URL and put it into the pictureUrl property of our user
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref)
+        .then(async (url) => {
+          user = await updateUser(userId, {pictureUrl: url}, true);
+          if (user) {
+            // Then, we will update our local copy of our user so we don't have to retrieve it every time we want to know something about our user
+            setData(user, "user");
+          }
+        });
+      }
+    );
+  }
+  catch(error) {
+    console.log(error);
+  }
 }

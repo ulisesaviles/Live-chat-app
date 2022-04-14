@@ -5,7 +5,8 @@ import {
   useColorScheme,
   View,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  SafeAreaView
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -16,13 +17,19 @@ import { ColorSchemeType } from "../../../types";
 //Icons
 import { Ionicons } from '@expo/vector-icons';
 
-// User queries
+//Components
+import { Input } from "../../../components/input";
+import { Button } from "../../../components/button";
 
-//Default react component
+// Queries
+import * as UserQueries from "../../../db/users";
+import { getData, setData } from "../../../config/asyncStorage";
+import { User } from "../../../interfaces";
+
 export default () => {
-  //Constants
   const [colorScheme, setColorScheme] = useState(useColorScheme());
   const [firstLoad, setFirstLoad] = useState(true);
+  const [name, setName] = useState('');
   const navigation = useNavigation<any>();
 
   // Helpers
@@ -40,6 +47,20 @@ export default () => {
   };
 
   // Functions
+  const onChangeName = (value: string) => {
+    setName(value);
+  }
+
+  const changeName = async() => {
+    if(name !== '') {
+      const user: any = await getData('user', true);
+      const updatedUser = await UserQueries.updateUser(user.userId, {name}, true);
+      if (updatedUser) {
+        setData(updatedUser, 'user');
+      }
+      navigation.navigate('Profile', {needsToReload: true});
+    }
+  }
 
   // On refresh
   useEffect(() => {
@@ -103,30 +124,23 @@ export default () => {
   //React component
 
   return (
-    <View style={styles.container} >
+    <SafeAreaView style={styles.container} >
 
       <View style={styles.header} >
         <Ionicons name="ios-arrow-back" style={styles.icon} onPress={() => navigation.goBack()} />
-        <Text style={styles.title} >Edit profile</Text>
+        <Text style={styles.title} >Change name</Text>
       </View>
 
-      <View style={styles.settings} >
-        <TouchableOpacity onPress={() => navigation.navigate('ChangePassword')}>
-          <View style={styles.element} >
-            <Ionicons name="ios-lock-closed" style={styles.icon} />
-            <Text style={styles.text} >Change password</Text>
-          </View>
-        </TouchableOpacity>
+      <Input
+        type="name"
+        label="New name"
+        placeholder="type your name"
+        onChangeText={onChangeName}
+        secureTextEntry={false}  />
 
-        <View style={styles.divider} ></View>
-        
-        <TouchableOpacity onPress={() => navigation.navigate("ChangeName")}>
-          <View style={styles.element} >
-            <Ionicons name="ios-person" style={styles.icon} />
-            <Text style={styles.text} >Change profile name</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    </View>
+      
+      <Button type="gradient" value="Change name" onPress={changeName}/>
+
+    </SafeAreaView>
   )
 }
