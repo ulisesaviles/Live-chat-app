@@ -5,7 +5,8 @@ const Tab = createBottomTabNavigator();
 // Import screens
 import Home from "./home";
 import Friends from "./friends";
-import Profile from "./profile";
+// import Profile from "./profile/profile";
+import { ProfileStack } from "./profile/profileStack";
 
 // Default react component
 export default () => {
@@ -24,7 +25,7 @@ export default () => {
       />
       <Tab.Screen
         name="profile"
-        component={Profile}
+        component={ProfileStack}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
