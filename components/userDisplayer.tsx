@@ -22,14 +22,15 @@ import profile from "../assets/profile.jpg";
 // Props interface
 interface props {
   user: User;
-  type?: "onlyName" | "withLastMessage";
+  type: "onlyName" | "withLastMessage";
   onPress?: any;
   lastMessage?: { message: string; hour: string };
   noMessage?: boolean;
+  state?: string;
 }
 
 // Actual react component to return
-export default ({ user, type, onPress, lastMessage }: props) => {
+export default ({ user, type, onPress, lastMessage, state }: props) => {
   // Constants
   const [colorScheme, setColorScheme] = useState(Appearance.getColorScheme());
   const [firstLoad, setFirstLoad] = useState(true);
@@ -83,14 +84,21 @@ export default ({ user, type, onPress, lastMessage }: props) => {
     message: {},
     name: {
       color: colors[colorScheme!].font.primary,
-      fontSize: 20,
+      fontSize: 18,
       fontWeight: "500",
       maxWidth: dimensions.width * 0.9 - 70,
       overflow: "hidden",
     },
+    state: {
+      color: colors[colorScheme!].font.primary,
+    },
     textContainer: {
       height: "100%",
       justifyContent: "center",
+    },
+    userName: {
+      color: colors[colorScheme!].font.accent,
+      fontWeight: "500",
     },
   });
 
@@ -105,6 +113,12 @@ export default ({ user, type, onPress, lastMessage }: props) => {
         <Text style={styles.name} numberOfLines={1}>
           {capitalize(user.name!)}
         </Text>
+        {type === "onlyName" ? (
+          <Text style={styles.userName}>
+            @{user.userName}
+            <Text style={styles.state}>{state ? ` • ${state}` : null}</Text>
+          </Text>
+        ) : null}
       </View>
     </TouchableOpacity>
   );
