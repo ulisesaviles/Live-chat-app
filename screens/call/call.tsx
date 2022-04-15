@@ -11,11 +11,11 @@ import {
 import { useNavigation } from "@react-navigation/native";
 
 // Theme
-import colors from "../config/colors";
-import { ColorSchemeType } from "../types";
+import colors from "../../config/colors";
+import { ColorSchemeType } from "../../types";
 
 // User queries
-import * as UserQueries from "../db/users";
+import * as UserQueries from "../../db/users";
 
 // Default react component
 export default () => {

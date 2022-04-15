@@ -36,7 +36,7 @@ import { useNavigation } from "@react-navigation/native";
 // Default react component
 export default () => {
   // Constants
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const [colorScheme, setColorScheme] = useState(useColorScheme());
   const [firstLoad, setFirstLoad] = useState(true);
   const [selectedPicUrl, setSelectedPicUrl] = useState('');
@@ -105,7 +105,7 @@ export default () => {
             </View>
           </View>
           <View style={styles.flexRow} >
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Call')} >
               <View style={styles.gradientBtn}>
                 <LinearGradient
                   colors={colors[getColorScheme()].gradients.main}

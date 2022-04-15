@@ -8,7 +8,7 @@ import Root from "./screens/root";
 import Login from "./screens/login";
 import Main from "./screens/main";
 import Chat from "./screens/chat/chat";
-import Call from "./screens/call";
+import Call from "./screens/call/call";
 import Welcome from "./screens/login/welcome";
 import AddFriend from "./screens/main/addFriend";
 import SignUp from "./screens/login/SignUp";
