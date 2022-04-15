@@ -1,5 +1,13 @@
 // Firestore (data base's) imports
-import { setDoc, doc, updateDoc, getDoc } from "firebase/firestore";
+import {
+  setDoc,
+  doc,
+  updateDoc,
+  getDoc,
+  getDocs,
+  collection,
+  onSnapshot,
+} from "firebase/firestore";
 import { uploadBytesResumable, ref, getDownloadURL } from "firebase/storage";
 
 // Auth imports
@@ -26,6 +34,19 @@ export async function createUser(
   password: string,
   name: string
 ): Promise<User> {
+  // Helpers
+  const getUserName = (fullName: string): string => {
+    fullName = fullName.trim();
+    const phraseAsArray: string[] = fullName.split(" ");
+    let phraseAsStr: string = "";
+    for (let i = 0; i < phraseAsArray.length; i++) {
+      const word = phraseAsArray[i];
+      phraseAsStr += word.charAt(0).toLowerCase();
+      phraseAsStr += word.substring(1);
+    }
+    return phraseAsStr;
+  };
+
   // Build default empty user
   let user: User = {
     name,
@@ -41,8 +62,13 @@ export async function createUser(
       password
     );
 
-    // Get user id
+    // Get userId
     const userId = userCredential.user.uid;
+
+    // Create userName
+    const usersColleciton = await getDocs(collection(firestore, "users"));
+    const userName = `${getUserName(name)}${usersColleciton.size}`;
+    user.userName = userName;
 
     // Create document in firestore
     await setDoc(doc(firestore, "users", userId), user);
@@ -82,11 +108,13 @@ export async function userSignIn(
       email,
       password
     );
+    const userId = userCredential.user.uid;
 
     // Build user object
     user = {
-      ...(await getUserDoc(userCredential.user.uid)),
+      ...(await getUserDoc(userId)),
       isLogedIn: true,
+      userId,
     };
 
     // Store user
@@ -153,8 +181,11 @@ export async function userSignOut(): Promise<void> {
   await signOut(auth);
 }
 
-//Change profile picture
-export async function changeProfilePic(userId: string, uri: string): Promise<any> {
+// Change profile picture
+export async function changeProfilePic(
+  userId: string,
+  uri: string
+): Promise<any> {
   try {
     // Here we transform our uri into a blob image
     let res: any = await fetch(uri);
@@ -166,20 +197,18 @@ export async function changeProfilePic(userId: string, uri: string): Promise<any
 
     // Then we create our job
     const uploadTask = uploadBytesResumable(storageRef, blob);
-    
+
     // When executing our opload
     uploadTask.on(
       "state_changed",
       // Here we can see our upload progress
-      (snapshot: any) => {
-      },
+      (snapshot: any) => {},
       // Here we will log the error in case we got any
       (error: any) => console.log(error),
       // Then, when we know everything went great, we will create a download URL and put it into the pictureUrl property of our user
       () => {
-        getDownloadURL(uploadTask.snapshot.ref)
-        .then(async (url) => {
-          user = await updateUser(userId, {pictureUrl: url}, true);
+        getDownloadURL(uploadTask.snapshot.ref).then(async (url) => {
+          user = await updateUser(userId, { pictureUrl: url }, true);
           if (user) {
             // Then, we will update our local copy of our user so we don't have to retrieve it every time we want to know something about our user
             setData(user, "user");
@@ -187,8 +216,18 @@ export async function changeProfilePic(userId: string, uri: string): Promise<any
         });
       }
     );
-  }
-  catch(error) {
+  } catch (error) {
     console.log(error);
   }
+}
+
+// Create userDoc listener
+type listenerCallBack = (user: User) => void;
+export function setUserDocListener(
+  userId: string,
+  callBack: listenerCallBack
+): void {
+  onSnapshot(doc(firestore, "users", userId), (document) => {
+    callBack({ ...document.data(), userId: document.id });
+  });
 }
