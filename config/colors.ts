@@ -22,9 +22,16 @@ export default {
       sender: ["rgb(22, 148, 186)", "rgb(11, 61, 193)"],
       receiver: "rgb(31, 38, 43)",
     },
+    tabBar: {
+      background: "rgba(0,0,0,0.1)",
+      icons: {
+        selected: "rgb(45, 112, 243)",
+        unselected: "rgb(180, 180, 180)",
+      },
+    },
   },
   light: {
-    background: "rgb(245,245,245)",
+    background: "rgb(255,255,255)",
     card: "rgb(255,255,255)",
     font: {
       primary: "rgb(0, 0, 0)",
@@ -45,6 +52,13 @@ export default {
     messages: {
       sender: ["rgb(22, 148, 186)", "rgb(11, 61, 193)"],
       receiver: "rgb(241, 241, 241)",
+    },
+    tabBar: {
+      background: "rgba(255,255,255,0.1)",
+      icons: {
+        selected: "rgb(45, 112, 243)",
+        unselected: "rgb(125, 125, 125)",
+      },
     },
   },
 };
