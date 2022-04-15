@@ -1,15 +1,12 @@
-import { FC, useState } from "react";
 import { 
   Dimensions,
   StyleSheet,
-  useColorScheme,
   View,
   Text,
   TextInput,
   Appearance
 } from "react-native"
 import colors from "../config/colors";
-import { ColorSchemeType } from "../types";
 
 // Constants
 const dimensions = {
@@ -50,15 +47,17 @@ interface InputProps {
   onChangeText: any;
   placeholder: string;
   secureTextEntry?: boolean;
+  noMargin?: boolean;
+  customWidth?: any;
 }
 
 const Input = (props: InputProps): JSX.Element => {
 
   return(
-    <View style={styles.inputContainer}>
+    <View style={[styles.inputContainer, props.noMargin && {marginBottom: 0}]}>
       <Text style={styles.inputTitle}>{props.label}</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, props.customWidth && {width: props.customWidth}]}
         value={props.value}
         onChangeText={props.onChangeText}
         placeholder={props.placeholder}
