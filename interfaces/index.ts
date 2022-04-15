@@ -26,6 +26,6 @@ export interface Message {
 
 // Chat interface
 export interface Chat {
-  messages: Message[];
+  messages?: Message[];
   usersIds: string[];
 }
