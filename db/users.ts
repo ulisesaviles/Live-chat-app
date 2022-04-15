@@ -22,7 +22,7 @@ import {
 import { firestore, auth, storage } from "../config/firebase";
 
 // Import user interface
-import { User } from "../interfaces";
+import { User, Chat } from "../interfaces";
 
 // AsyncStorage handler
 import { setData } from "../config/asyncStorage";
@@ -230,4 +230,148 @@ export function setUserDocListener(
   onSnapshot(doc(firestore, "users", userId), (document) => {
     callBack({ ...document.data(), userId: document.id });
   });
+}
+
+// Create chat doc
+export async function createChat(usersIds: string[]): Promise<string | null> {
+  try {
+    // Build info object
+    const newChatInfo: Chat = { usersIds };
+
+    // Create chatId
+    const chatId: string = `${usersIds[0]}_${usersIds[1]}`;
+
+    // Create info doc
+    const chatsCollection = collection(firestore, "chats");
+    const chatsDoc = doc(chatsCollection, "chatsDoc");
+    const chatCollection = collection(chatsDoc, chatId);
+    const infoDoc = doc(chatCollection, "info");
+    await setDoc(infoDoc, newChatInfo);
+
+    // Return id
+    return chatId;
+  } catch (e) {
+    console.log(e);
+    // Return err
+    return null;
+  }
+}
+
+// Send a user a friend request
+export async function sendFriendRequest(
+  userId: string,
+  myId: string
+): Promise<boolean> {
+  try {
+    // Get users current requests
+    let user = await getUserDoc(userId);
+
+    // Push myId
+    user.requests?.push(myId);
+
+    // Update userDoc
+    await updateUser(userId, { requests: user.requests });
+
+    // Return Success
+    return true;
+  } catch (e) {
+    // Error
+    return false;
+  }
+}
+
+// Decline friend request
+export async function declineFriendRequest(
+  userId: string,
+  myId: string
+): Promise<boolean> {
+  try {
+    // Get my document to read requests
+    let user = await getUserDoc(myId);
+
+    // Push myId
+    user.requests?.splice(user.requests.indexOf(userId), 1);
+
+    // Update userDoc
+    await updateUser(myId, { requests: user.requests });
+
+    // Return Success
+    return true;
+  } catch (e) {
+    // Error
+    return false;
+  }
+}
+
+// Accept friend request
+export async function acceptFriendRequest(
+  userId: string,
+  myId: string
+): Promise<boolean> {
+  try {
+    // Get both users
+    let me = await getUserDoc(myId);
+    let him = await getUserDoc(userId);
+
+    // Remove him from my requests
+    me.requests?.splice(me.requests.indexOf(userId), 1);
+
+    // Add friends
+    me.friendsIds?.push(userId);
+    him.friendsIds?.push(myId);
+
+    // Create chat
+    const chatId = await createChat([myId, userId]);
+
+    // Add chatId to both users
+    me.chatsIds?.push(chatId!);
+    him.chatsIds?.push(chatId!);
+
+    // Update both users
+    await updateUser(myId, {
+      requests: me.requests,
+      friendsIds: me.friendsIds,
+      chatsIds: me.chatsIds,
+    });
+    await updateUser(userId, {
+      friendsIds: him.friendsIds,
+      chatsIds: him.chatsIds,
+    });
+
+    // Return Success
+    return true;
+  } catch (e) {
+    // Error
+    return false;
+  }
+}
+
+// Remove friend
+export async function removeFriend(
+  userId: string,
+  myId: string
+): Promise<boolean> {
+  try {
+    // Get both users
+    let me = await getUserDoc(myId);
+    let him = await getUserDoc(userId);
+
+    // Remove friends
+    me.friendsIds?.splice(me.friendsIds.indexOf(userId), 1);
+    him.friendsIds?.splice(him.friendsIds.indexOf(myId), 1);
+
+    // Update both users
+    await updateUser(myId, {
+      friendsIds: me.friendsIds,
+    });
+    await updateUser(userId, {
+      friendsIds: him.friendsIds,
+    });
+
+    // Return Success
+    return true;
+  } catch (e) {
+    // Error
+    return false;
+  }
 }
