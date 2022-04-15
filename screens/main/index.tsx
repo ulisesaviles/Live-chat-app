@@ -8,11 +8,14 @@ import Friends from "./friends";
 // import Profile from "./profile/profile";
 import { ProfileStack } from "./profile/profileStack";
 
+// Import tabBat
+import TabBar from "../../components/TabBar";
+
 // Default react component
 export default () => {
   // React component
   return (
-    <Tab.Navigator>
+    <Tab.Navigator tabBar={(props) => <TabBar {...props} />}>
       <Tab.Screen
         name="home"
         component={Home}
