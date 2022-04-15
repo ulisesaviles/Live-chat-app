@@ -41,7 +41,7 @@ export async function createUser(
     let phraseAsStr: string = "";
     for (let i = 0; i < phraseAsArray.length; i++) {
       const word = phraseAsArray[i];
-      phraseAsStr += word.charAt(0).toLowerCase();
+      phraseAsStr += word.charAt(0).toUpperCase();
       phraseAsStr += word.substring(1);
     }
     return phraseAsStr;
