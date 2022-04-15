@@ -12,6 +12,7 @@ export interface User {
   userId?: string;
   isLogedIn?: boolean | undefined;
   exists?: boolean;
+  userName?: string;
 }
 
 // Message interface (to be contained in chats)
