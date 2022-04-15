@@ -5,63 +5,107 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
+  Image,
+  View,
 } from "react-native";
+import { useState, useEffect } from "react";
 
 // Colors
 import colors from "../config/colors";
+
+// Interfaces
 import { User } from "../interfaces";
 
-// Constants
-const dimensions = {
-  height: Dimensions.get("screen").height,
-  width: Dimensions.get("screen").width,
-};
+// Import profile img
+import profile from "../assets/profile.jpg";
 
-// Functions
-const capitalize = (phrase: string): string => {
-  phrase = phrase.trim();
-  const phraseAsArray: string[] = phrase.split(" ");
-  let phraseAsStr: string = "";
-  for (let i = 0; i < phraseAsArray.length; i++) {
-    const word = phraseAsArray[i];
-    phraseAsStr += word.charAt(0).toLowerCase();
-    phraseAsStr += word.substring(1) + " ";
-  }
-  return phraseAsStr;
-};
-
-const getColorScheme = () => {
-  return Appearance.getColorScheme() || "dark";
-};
-
-const styles = StyleSheet.create({
-  text: {
-    color: "white",
-    fontSize: 22,
-    fontWeight: "500",
-  },
-  primaryBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 50,
-    borderRadius: 20,
-    backgroundColor: colors[getColorScheme()].btn.background,
-    marginTop: dimensions.height * 0.025,
-    marginBottom: 20,
-  },
-  gradientBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 50,
-    borderRadius: 20,
-  },
-});
-
+// Props interface
 interface props {
   user: User;
   type?: "onlyName" | "withLastMessage";
   onPress?: any;
   lastMessage?: { message: string; hour: string };
+  noMessage?: boolean;
 }
 
+// Actual react component to return
 export default ({ user, type, onPress, lastMessage }: props) => {
-  return <Text>{capitalize(user.name!)}</Text>;
+  // Constants
+  const [colorScheme, setColorScheme] = useState(Appearance.getColorScheme());
+  const [firstLoad, setFirstLoad] = useState(true);
+  const dimensions = {
+    height: Dimensions.get("screen").height,
+    width: Dimensions.get("screen").width,
+  };
+
+  // Functions
+  const capitalize = (phrase: string): string => {
+    phrase = phrase.trim();
+    const phraseAsArray: string[] = phrase.split(" ");
+    let phraseAsStr: string = "";
+    for (let i = 0; i < phraseAsArray.length; i++) {
+      const word = phraseAsArray[i];
+      phraseAsStr += word.charAt(0).toUpperCase();
+      phraseAsStr += word.substring(1) + " ";
+    }
+    return phraseAsStr;
+  };
+
+  const handleFirstLoad = () => {
+    setFirstLoad(false);
+    Appearance.addChangeListener(() => {
+      setColorScheme(Appearance.getColorScheme());
+    });
+  };
+
+  // On refresh
+  useEffect(() => {
+    if (firstLoad) {
+      handleFirstLoad();
+    }
+  });
+
+  // Styles
+  const styles = StyleSheet.create({
+    container: {
+      paddingHorizontal: dimensions.width * 0.05,
+      flexDirection: "row",
+      height: 60,
+      alignItems: "center",
+    },
+    hour: {},
+    img: {
+      width: 50,
+      height: 50,
+      marginRight: 20,
+      borderRadius: 100,
+    },
+    message: {},
+    name: {
+      color: colors[colorScheme!].font.primary,
+      fontSize: 20,
+      fontWeight: "500",
+      maxWidth: dimensions.width * 0.9 - 70,
+      overflow: "hidden",
+    },
+    textContainer: {
+      height: "100%",
+      justifyContent: "center",
+    },
+  });
+
+  // TSX component
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.container}>
+      <Image
+        source={user.pictureUrl ? { uri: user.pictureUrl } : profile}
+        style={styles.img}
+      />
+      <View style={styles.textContainer}>
+        <Text style={styles.name} numberOfLines={1}>
+          {capitalize(user.name!)}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
 };
