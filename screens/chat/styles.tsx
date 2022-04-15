@@ -55,12 +55,11 @@ export const styles: any = StyleSheet.create({
     marginRight: 20
   },
   gradientBtn: {
-    paddingVertical: 6,
-    paddingHorizontal: 7,
     borderRadius: 20,
+    overflow: 'hidden'
   },
   callIconSize: {
-    fontSize: 14,
+    fontSize: 16,
     borderRadius: 100
   },
 });

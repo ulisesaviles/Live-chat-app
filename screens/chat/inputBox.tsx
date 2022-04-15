@@ -19,6 +19,7 @@ import colors from "../../config/colors";
 // Icons
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from "react";
+import { Message } from "../../interfaces";
 
 const getColorScheme = () => {
   return Appearance.getColorScheme() || 'dark';
@@ -58,11 +59,10 @@ const styles = StyleSheet.create({
   }
 })
 
-export const InputBox = (): JSX.Element => {
+export const InputBox = ({userId, onSendMessage}:{userId: string, onSendMessage: any}): JSX.Element => {
   // Constants
   const [keyboardOn, toggleKeyboard] = useState(false);
-  // const [maxHeightAchieved, setHeightMaxed] = useState(false);
-  const [selectedPicture, setPicture]: any[] = useState(null);
+  const [messageText, setText] = useState('');
 
   //Events
   Keyboard.addListener('keyboardWillShow', () => {
@@ -82,13 +82,35 @@ export const InputBox = (): JSX.Element => {
 
 
     if (!res.cancelled) {
-      setPicture(res.uri);
+      const message: Message = {
+        id: 5,
+        type: 'img',
+        pictureUrl: res.uri,
+        senderId: userId
+      };
+
+      onSendMessage(message);
+    }
+    closeKeyboard();
+  }
+
+  const onSendText = () => {
+    if (messageText) {
+      const message: Message = {
+        id: 5,
+        type: 'txt',
+        text: messageText,
+        senderId: userId
+      };
+      onSendMessage(message);
+      closeKeyboard();
     }
   }
 
-  useEffect(() => {
-    console.log(selectedPicture);
-  }, [selectedPicture]);
+  const closeKeyboard = () => {
+    setText('');
+    Keyboard.dismiss();
+  }
 
   return(
     <KeyboardAvoidingView behavior="padding" >
@@ -107,8 +129,20 @@ export const InputBox = (): JSX.Element => {
               placeholderTextColor={
                 colors[getColorScheme()].input.placeholder
               }
+              onChangeText={(value) => setText(value)}
+              value={messageText}
             />
-            <TouchableOpacity style={[styles.button, {backgroundColor: colors[getColorScheme()].font.accent}]} >
+            <TouchableOpacity
+              disabled={messageText === ''}
+              style={
+                [
+                  styles.button,
+                  {
+                    backgroundColor: messageText !== '' ? colors[getColorScheme()].font.accent : colors[getColorScheme()].font.secondary 
+                  }
+                ]
+              }
+              onPress={onSendText} >
                 <Ionicons name="ios-send" style={styles.icon} />
             </TouchableOpacity>
           </View>

@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { View, Text, Image, Appearance, StyleSheet } from "react-native";
+import { View, Text, Image, Appearance, StyleSheet, TouchableWithoutFeedback } from "react-native";
 import colors from "../../config/colors";
 import { Message } from "../../interfaces";
 
@@ -25,23 +25,24 @@ const styles = StyleSheet.create({
   },
   
   messageMine: {
-    padding: 10,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 2,
     backgroundColor: colors[getColorScheme()].input.background,
-    maxWidth: '80%'
+    maxWidth: '80%',
+    overflow: "hidden"
   },
   text: {
-    fontSize: 14,
+    fontSize: 16,
     color: colors[getColorScheme()].font.primary,
     flexWrap: 'wrap'
   },
   image: {
-    borderRadius: 5,
-    width: 'auto',
-    height: 'auto'
+    borderRadius: 15,
+    height: 200,
+    width: 200,
+    zIndex: 3
   },
   profilePic: {
     borderRadius: 100,
@@ -54,8 +55,9 @@ interface MessageProps {
   message: Message;
   userId: string;
   profilePictureUrl?: string;
+  onPressImage: any;
 }
-export const MessageComponent = ({message, userId, profilePictureUrl }: MessageProps) => {
+export const MessageComponent = ({message, userId, profilePictureUrl, onPressImage }: MessageProps) => {
   const senderIsNotSelf = userId !== message.senderId;
 
   return(
@@ -65,32 +67,40 @@ export const MessageComponent = ({message, userId, profilePictureUrl }: MessageP
       ?
       <View style={[styles.messageWrap, {justifyContent: 'flex-start'}]}>
         <Image style={[styles.profilePic, {marginRight: 8}]} source={{uri: profilePictureUrl}} />
-        <View style={styles.messageSender} >
+        <View style={[styles.messageSender, message.type === 'img' && {padding: 5}]} >
           {
             message.type == 'txt'
             ?
             <Text style={styles.text} >{message.text}</Text>
             :
-            <Image style={styles.image} source={{uri: message.pictureUrl}} />
+            <TouchableWithoutFeedback onPress={() => onPressImage(message.pictureUrl)}>
+                <Image resizeMode="contain" style={styles.image} source={{uri: message.pictureUrl}} />
+              </TouchableWithoutFeedback>
           }
         </View>
       </View>
       :
       <View style={[styles.messageWrap, {justifyContent: 'flex-end'}]}>
-        <LinearGradient
-          colors={colors[getColorScheme()].gradients.main}
-          style={styles.messageMine}
-        >
-          <View >
-            {
-              message.type == 'txt'
-              ?
-              <Text style={[styles.text, {textAlign: 'right'}]} >{message.text}</Text>
-              :
-              <Image style={styles.image} source={{uri: message.pictureUrl}} />
-            }
-          </View>
-        </LinearGradient>
+        <View style={styles.messageMine}>
+          <LinearGradient
+            colors={colors[getColorScheme()].gradients.main}
+            style={[{padding: message.type === 'img' ? 5 : 10}]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <View style={{flex: 1}} >
+              {
+                message.type == 'txt'
+                ?
+                <Text style={[styles.text, {textAlign: 'right'}]} >{message.text}</Text>
+                :
+                <TouchableWithoutFeedback onPress={() => onPressImage(message.pictureUrl)}>
+                  <Image resizeMode="contain" style={styles.image} source={{uri: message.pictureUrl}} />
+                </TouchableWithoutFeedback>
+              }
+            </View>
+          </LinearGradient>
+        </View>
         <Image style={[styles.profilePic, {marginLeft: 8}]} source={{uri: profilePictureUrl}} />
       </View>
     }
