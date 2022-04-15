@@ -13,7 +13,7 @@ import {
 
 // Theme
 import colors from "../../config/colors";
-import { ColorSchemeType } from "../../types";
+import { CallStates, ColorSchemeType } from "../../types";
 import { LinearGradient } from "expo-linear-gradient";
 import { styles } from "./styles";
 
@@ -105,7 +105,7 @@ export default () => {
             </View>
           </View>
           <View style={styles.flexRow} >
-            <TouchableOpacity onPress={() => navigation.navigate('Call')} >
+            <TouchableOpacity onPress={() => navigation.navigate('Call', {callState: CallStates.WAITING})} >
               <View style={styles.gradientBtn}>
                 <LinearGradient
                   colors={colors[getColorScheme()].gradients.main}

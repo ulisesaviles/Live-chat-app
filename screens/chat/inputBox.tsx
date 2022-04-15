@@ -7,10 +7,8 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
-  Image,
-  SafeAreaView
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import { useState } from "react";
 import * as ImagePicker from 'expo-image-picker';
 
 // Theme
@@ -18,7 +16,6 @@ import colors from "../../config/colors";
 
 // Icons
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useState } from "react";
 import { Message } from "../../interfaces";
 
 const getColorScheme = () => {
