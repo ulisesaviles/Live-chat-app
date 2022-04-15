@@ -1,5 +1,5 @@
 // React native imports
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -14,6 +14,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import ActionSheet from "react-native-actionsheet";
 
 // Expo imports
 import { BlurView } from "expo-blur";
@@ -42,13 +43,24 @@ export default () => {
   type tabs = "friends" | "requests";
   const availableTabs: tabs[] = ["friends", "requests"];
   const [selectedTab, setSelectedTab]: [tabs, any] = useState(availableTabs[0]);
-  const [user, setUser]: [User | null, any] = useState(null);
   const [friends, setFriends]: [User[], any] = useState(null);
   const [requests, setRequests]: [User[], any] = useState(null);
+  const [user, setUser]: [User, any] = useState(null);
   const dimensions = {
     height: Dimensions.get("screen").height,
     width: Dimensions.get("screen").width,
   };
+  const actionSheets: { [key: string]: any } = {
+    requests: useRef(),
+    friends: useRef(),
+  };
+  const [selectedUser, setSelectedUser]: {
+    id: null | string;
+    state: null | string;
+  } = useState({
+    id: null,
+    state: null,
+  });
 
   // Helpers
   const capitalize = (phrase: string): string => {
@@ -72,6 +84,7 @@ export default () => {
   const getUsers = async () => {
     // Get user
     const user: User = (await getData("user", true))!;
+    setUser(user);
 
     // SetListener
     UserQueries.setUserDocListener(user.userId!, async (user) => {
@@ -96,12 +109,70 @@ export default () => {
     });
   };
 
+  const handleActionSheet = async (type: string, index: number) => {
+    // Get selected user from async storage
+    const selectedUser: User = await getData("selectedUser", true)!;
+
+    // Requests
+    if (type === "requests") {
+      // Close
+      if (index === 2) return;
+
+      // Loading
+      setSelectedUser({
+        id: selectedUser.userId,
+        state: "Loading...",
+      });
+
+      // Decline
+      if (index === 1) {
+        await UserQueries.declineFriendRequest(
+          selectedUser.userId!,
+          user.userId!
+        );
+      }
+
+      // Accept
+      if (index === 0) {
+        await UserQueries.acceptFriendRequest(
+          selectedUser.userId!,
+          user.userId!
+        );
+      }
+    }
+
+    // Friends
+    if (type === "friends") {
+      // Close
+      if (index === 1) return;
+
+      // Loading
+      setSelectedUser({
+        id: selectedUser.userId,
+        state: "Loading...",
+      });
+
+      // Remove
+      if (index === 0) {
+        await UserQueries.removeFriend(selectedUser.userId!, user.userId!);
+      }
+    }
+
+    setSelectedUser({ index: null, state: null });
+  };
+
   const handleFirstLoad = () => {
     setFirstLoad(false);
     Appearance.addChangeListener(() => {
       setColorScheme(Appearance.getColorScheme());
     });
     getUsers();
+  };
+
+  const showActionSheet = async (name: string, selectedUser: User) => {
+    await setData(selectedUser, "selectedUser");
+    //To show the Bottom ActionSheet
+    actionSheets[name].current.show();
   };
 
   // On refresh
@@ -237,7 +308,16 @@ export default () => {
               {selectedTab === "friends"
                 ? friends.map((user) => (
                     <View key={user.userId}>
-                      <UserDisplayer user={user} />
+                      <UserDisplayer
+                        user={user}
+                        onPress={() => showActionSheet(selectedTab, user)}
+                        type="onlyName"
+                        state={
+                          selectedUser.id === user.userId
+                            ? selectedUser.state
+                            : null
+                        }
+                      />
                       {friends.indexOf(user) === friends.length - 1 ? null : (
                         <View style={styles.separator} />
                       )}
@@ -245,7 +325,16 @@ export default () => {
                   ))
                 : requests.map((user) => (
                     <View key={user.userId}>
-                      <UserDisplayer user={user} />
+                      <UserDisplayer
+                        user={user}
+                        onPress={() => showActionSheet(selectedTab, user)}
+                        type="onlyName"
+                        state={
+                          selectedUser.id === user.userId
+                            ? selectedUser.state
+                            : null
+                        }
+                      />
                       {requests.indexOf(user) === requests.length - 1 ? null : (
                         <View style={styles.separator} />
                       )}
@@ -312,6 +401,26 @@ export default () => {
           </View>
         </SafeAreaView>
       </BlurView>
+
+      {/* Requests */}
+      <ActionSheet
+        ref={actionSheets.requests}
+        title="What do you whant to do?"
+        options={["Accept", "Decline", "Close"]}
+        cancelButtonIndex={2}
+        destructiveButtonIndex={1}
+        onPress={(index: number) => handleActionSheet("requests", index)}
+      />
+
+      {/* Friends */}
+      <ActionSheet
+        ref={actionSheets.friends}
+        title="What do you whant to do?"
+        options={["Remove friend", "Close"]}
+        cancelButtonIndex={1}
+        destructiveButtonIndex={0}
+        onPress={(index: number) => handleActionSheet("friends", index)}
+      />
     </View>
   );
 };
