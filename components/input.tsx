@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from "react";
-import { main
+import {
   Dimensions,
   StyleSheet,
   View,
@@ -92,10 +91,15 @@ const Input = (props: InputProps): JSX.Element => {
   });
 
   return (
-    <View style={[styles.inputContainer, props.noMargin && {marginBottom: 0}]}>
+    <View
+      style={[styles.inputContainer, props.noMargin && { marginBottom: 0 }]}
+    >
       <Text style={styles.inputTitle}>{props.label}</Text>
       <TextInput
-        style={[styles.input, props.customWidth && {width: props.customWidth}]}
+        style={[
+          styles.input,
+          props.customWidth && { width: props.customWidth },
+        ]}
         value={props.value}
         onChangeText={props.onChangeText}
         placeholder={props.placeholder}

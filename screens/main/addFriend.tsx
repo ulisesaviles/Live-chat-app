@@ -268,7 +268,7 @@ export default () => {
           {/* Title section */}
           <View style={styles.headerTopSectionContainer}>
             {/* Title */}
-            <Text style={styles.title}>People</Text>
+            <Text style={styles.title}>Add friend</Text>
             {/* Add btn */}
             <View style={styles.headerBtnContainer}>
               <Button
