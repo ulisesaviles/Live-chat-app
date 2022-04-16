@@ -9,7 +9,6 @@ import {
   useColorScheme,
   TouchableOpacity,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 
 import * as ImagePicker from 'expo-image-picker';
 

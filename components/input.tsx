@@ -1,8 +1,8 @@
-import { FC, useEffect, useState } from "react";
-import {
+
+import { useEffect, useState } from "react";
+import { main
   Dimensions,
   StyleSheet,
-  useColorScheme,
   View,
   Text,
   TextInput,
@@ -49,6 +49,8 @@ interface InputProps {
   onChangeText: any;
   placeholder: string;
   secureTextEntry?: boolean;
+  noMargin?: boolean;
+  customWidth?: any;
 }
 
 const Input = (props: InputProps): JSX.Element => {
@@ -90,10 +92,10 @@ const Input = (props: InputProps): JSX.Element => {
   });
 
   return (
-    <View style={styles.inputContainer}>
+    <View style={[styles.inputContainer, props.noMargin && {marginBottom: 0}]}>
       <Text style={styles.inputTitle}>{props.label}</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, props.customWidth && {width: props.customWidth}]}
         value={props.value}
         onChangeText={props.onChangeText}
         placeholder={props.placeholder}

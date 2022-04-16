@@ -17,6 +17,7 @@ export default {
     gradients: {
       main: ["rgb(44, 99, 244)", "rgb(52, 185, 233)"],
       red: ["rgb(255, 0, 0)", "rgb(208, 76, 116)"],
+      green: ["rgb(0, 255, 0)", "rgb(76, 208, 116)"],
     },
     messages: {
       sender: ["rgb(22, 148, 186)", "rgb(11, 61, 193)"],
@@ -48,6 +49,7 @@ export default {
     gradients: {
       main: ["rgb(44, 99, 244)", "rgb(52, 185, 233)"],
       red: ["rgb(255, 0, 0)", "rgb(208, 76, 116)"],
+      green: ["rgb(0, 255, 0)", "rgb(76, 208, 116)"],
     },
     messages: {
       sender: ["rgb(22, 148, 186)", "rgb(11, 61, 193)"],
