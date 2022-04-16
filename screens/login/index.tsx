@@ -70,14 +70,14 @@ export default () => {
     setLoading(true);
 
     // Check inputs
-    if (!isAValidEmail(email)) {
+    if (!isAValidEmail(email.trim())) {
       Alert.alert("Enter a valid email");
       setLoading(false);
       return;
     }
 
     // Sign in
-    const user = await UserQueries.userSignIn(email, password);
+    const user = await UserQueries.userSignIn(email.trim(), password);
 
     // If failed
     if (!user.isLogedIn) Alert.alert("Error", "User not found");
