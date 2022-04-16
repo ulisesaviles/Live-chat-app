@@ -267,7 +267,7 @@ export async function sendFriendRequest(
     let user = await getUserDoc(userId);
 
     // Push myId
-    user.requests?.push(myId);
+    if (!user.requests?.includes(myId)) user.requests?.push(myId);
 
     // Update userDoc
     await updateUser(userId, { requests: user.requests });
@@ -374,4 +374,26 @@ export async function removeFriend(
     // Error
     return false;
   }
+}
+
+// Get all users
+export async function getAllUsers(): Promise<User[] | null> {
+  try {
+    // Get users collection
+    const usersColleciton = await getDocs(collection(firestore, "users"));
+
+    // Parse collection into array of users
+    let users: User[] = [];
+    usersColleciton.forEach((doc) => {
+      users.push({
+        userId: doc.id,
+        ...doc.data(),
+      });
+    });
+
+    // Return it
+    return users;
+  } catch (e) {}
+  // Return err
+  return null;
 }
