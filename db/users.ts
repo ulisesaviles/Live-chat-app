@@ -22,7 +22,10 @@ import {
 import { firestore, auth, storage } from "../config/firebase";
 
 // Import user interface
-import { User, Chat } from "../interfaces";
+import { User } from "../interfaces";
+
+// Import chat functions
+import { createChat } from "./chats";
 
 // AsyncStorage handler
 import { setData } from "../config/asyncStorage";
@@ -232,31 +235,6 @@ export function setUserDocListener(
   });
 }
 
-// Create chat doc
-export async function createChat(usersIds: string[]): Promise<string | null> {
-  try {
-    // Build info object
-    const newChatInfo: Chat = { usersIds };
-
-    // Create chatId
-    const chatId: string = `${usersIds[0]}_${usersIds[1]}`;
-
-    // Create info doc
-    const chatsCollection = collection(firestore, "chats");
-    const chatsDoc = doc(chatsCollection, "chatsDoc");
-    const chatCollection = collection(chatsDoc, chatId);
-    const infoDoc = doc(chatCollection, "info");
-    await setDoc(infoDoc, newChatInfo);
-
-    // Return id
-    return chatId;
-  } catch (e) {
-    console.log(e);
-    // Return err
-    return null;
-  }
-}
-
 // Send a user a friend request
 export async function sendFriendRequest(
   userId: string,
@@ -360,12 +338,26 @@ export async function removeFriend(
     me.friendsIds?.splice(me.friendsIds.indexOf(userId), 1);
     him.friendsIds?.splice(him.friendsIds.indexOf(myId), 1);
 
+    // Remove chatsIds
+    let chatId: string;
+    for (let i = 0; i < me.chatsIds!.length; i++) {
+      const tempChatId = me.chatsIds![i];
+      const userIds = tempChatId.split("_");
+      if (userIds.includes(userId)) {
+        chatId = tempChatId;
+        me.chatsIds?.splice(i, 1);
+      }
+    }
+    him.chatsIds?.splice(him.chatsIds.indexOf(chatId!), 1);
+
     // Update both users
     await updateUser(myId, {
       friendsIds: me.friendsIds,
+      chatsIds: me.chatsIds,
     });
     await updateUser(userId, {
       friendsIds: him.friendsIds,
+      chatsIds: him.chatsIds,
     });
 
     // Return Success
