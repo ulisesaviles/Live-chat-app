@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 5,
-    elevation: 1
+    elevation: 1,
   },
   centered: {
     flex: 1,
@@ -20,9 +20,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   image: {
-    width: Dimensions.get('screen').width * 0.8,
-    height: Dimensions.get('screen').height * 0.8,
-    borderRadius: 10
+    width: Dimensions.get('screen').width,
+    height: Dimensions.get('screen').height,
+    borderRadius: 10,
+    backgroundColor: colors[getColorScheme()].card
   }
 })
 
@@ -31,14 +32,13 @@ export const PictureModal = ({visible, uri, onCloseModal}:{visible: boolean, uri
       <View style={styles.modal}>
         <Modal
           animationType="fade"
-          transparent
           presentationStyle="overFullScreen"
           visible={visible}
           onRequestClose={onCloseModal}
         >
           <TouchableWithoutFeedback onPress={onCloseModal}>
             <View style={styles.centered} >
-              <Image resizeMethod="scale" resizeMode="contain" style={styles.image} source={{uri}}/>
+              <Image resizeMode="contain" style={styles.image} source={{uri}}/>
             </View>
           </TouchableWithoutFeedback>
         </Modal>
