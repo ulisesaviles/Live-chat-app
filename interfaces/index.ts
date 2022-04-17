@@ -28,4 +28,5 @@ export interface Message {
 export interface Chat {
   messages?: Message[];
   usersIds: string[];
+  lastMessageId: string;
 }
