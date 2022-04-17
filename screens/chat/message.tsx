@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     height: 200,
     width: 200,
-    zIndex: 3
+    zIndex: 3,
   },
   profilePic: {
     borderRadius: 100,
@@ -67,40 +67,40 @@ export const MessageComponent = ({message, userId, profilePictureUrl, onPressIma
       ?
       <View style={[styles.messageWrap, {justifyContent: 'flex-start'}]}>
         <Image style={[styles.profilePic, {marginRight: 8}]} source={{uri: profilePictureUrl}} />
-        <View style={[styles.messageSender, message.type === 'img' && {padding: 5}]} >
-          {
-            message.type == 'txt'
-            ?
+        {
+          message.type == 'txt'
+          ?
+          <View style={styles.messageSender} >
             <Text style={styles.text} >{message.text}</Text>
-            :
-            <TouchableWithoutFeedback onPress={() => onPressImage(message.pictureUrl)}>
-                <Image resizeMode="contain" style={styles.image} source={{uri: message.pictureUrl}} />
-              </TouchableWithoutFeedback>
-          }
-        </View>
+          </View>
+          :
+          <TouchableWithoutFeedback onPress={() => onPressImage(message.pictureUrl)} style={{overflow: 'hidden'}}>
+            <Image resizeMode="contain" style={styles.image} source={{uri: message.pictureUrl}} />
+          </TouchableWithoutFeedback>
+        }
       </View>
       :
       <View style={[styles.messageWrap, {justifyContent: 'flex-end'}]}>
-        <View style={styles.messageMine}>
-          <LinearGradient
-            colors={colors[getColorScheme()].gradients.main}
-            style={[{padding: message.type === 'img' ? 5 : 10}]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={{flex: 1}} >
-              {
-                message.type == 'txt'
-                ?
+        {
+          message.type == 'txt'
+          ?
+          <View style={styles.messageMine}>
+            <LinearGradient
+              colors={colors[getColorScheme()].gradients.main}
+              style={[{padding: 10}]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <View style={{flex: 1}} >
                 <Text style={[styles.text, {textAlign: 'right'}]} >{message.text}</Text>
-                :
-                <TouchableWithoutFeedback onPress={() => onPressImage(message.pictureUrl)}>
-                  <Image resizeMode="contain" style={styles.image} source={{uri: message.pictureUrl}} />
-                </TouchableWithoutFeedback>
-              }
-            </View>
-          </LinearGradient>
-        </View>
+              </View>
+            </LinearGradient>
+          </View>
+          :
+          <TouchableWithoutFeedback onPress={() => onPressImage(message.pictureUrl)} style={{overflow: 'hidden'}}>
+            <Image resizeMode="cover" style={styles.image} source={{uri: message.pictureUrl}} />
+          </TouchableWithoutFeedback>
+        }
         <Image style={[styles.profilePic, {marginLeft: 8}]} source={{uri: profilePictureUrl}} />
       </View>
     }
