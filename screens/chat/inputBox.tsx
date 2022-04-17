@@ -88,7 +88,7 @@ export const InputBox = ({userId, onSendMessage}:{userId: string, onSendMessage:
 
       onSendMessage(message);
     }
-    closeKeyboard();
+    setText('');
   }
 
   const onSendText = () => {
@@ -100,13 +100,8 @@ export const InputBox = ({userId, onSendMessage}:{userId: string, onSendMessage:
         senderId: userId
       };
       onSendMessage(message);
-      closeKeyboard();
+      setText('');
     }
-  }
-
-  const closeKeyboard = () => {
-    setText('');
-    Keyboard.dismiss();
   }
 
   return(

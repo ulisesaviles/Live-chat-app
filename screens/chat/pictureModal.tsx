@@ -38,7 +38,7 @@ export const PictureModal = ({visible, uri, onCloseModal}:{visible: boolean, uri
         >
           <TouchableWithoutFeedback onPress={onCloseModal}>
             <View style={styles.centered} >
-              <Image resizeMethod="scale" resizeMode="contain" style={styles.image} source={{uri}}/>
+              <Image resizeMode="contain" style={styles.image} source={{uri}}/>
             </View>
           </TouchableWithoutFeedback>
         </Modal>
