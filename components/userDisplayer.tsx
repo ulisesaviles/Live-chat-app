@@ -118,6 +118,15 @@ export default ({ user, type, onPress, lastMessage, state }: props) => {
             @{user.userName}
             <Text style={styles.state}>{state ? ` • ${state}` : null}</Text>
           </Text>
+        ) : type === "withLastMessage" ? (
+          <Text style={styles.state}>
+            {lastMessage === undefined || lastMessage.message === undefined
+              ? `Say hello to ${user.name}👋`
+              : lastMessage?.message}
+            <Text style={styles.state}>
+              {lastMessage?.message ? ` • ${lastMessage?.hour}` : null}
+            </Text>
+          </Text>
         ) : null}
       </View>
     </TouchableOpacity>
