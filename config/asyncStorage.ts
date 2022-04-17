@@ -17,3 +17,7 @@ export async function getData(
   if (isObject) return JSON.parse(data);
   return data;
 }
+
+export async function removeData(key: string): Promise<void> {
+  await AsyncStorage.removeItem(key);
+}
