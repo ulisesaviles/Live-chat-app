@@ -18,6 +18,7 @@ import { ColorSchemeType } from "../types";
 
 // User queries
 import * as UserQueries from "../db/users";
+import { removeData, setData } from "../config/asyncStorage";
 
 export default () => {
   // ColorScheme
@@ -38,14 +39,15 @@ export default () => {
       setColorScheme(Appearance.getColorScheme());
     });
     UserQueries.createAuthListener(
-      (userId: string) => {
-        console.log(`Loged in as: "${userId}"`);
+      async (userId: string) => {
+        const user = await UserQueries.getUserDoc(userId);
+        await setData(user, "user");
         navigation.navigate("Main");
       },
-      () => {
-        console.log("Signed out.");
+      async () => {
+        await removeData("user");
         navigation.navigate("Root");
-        navigation.navigate("Login");
+        setTimeout(() => navigation.navigate("Login"), 50);
       }
     );
   };
