@@ -78,15 +78,12 @@ export default () => {
     UserQueries.setUserDocListener(user.userId!, async (updatedUser) => {
       setUser(updatedUser);
       setData(updatedUser, "user");
-      console.log("User doc changed");
 
-      console.log(`${updatedUser.chatsIds?.length} !== ${chats.length}`);
       // Check if a chat was removed
       if (updatedUser.chatsIds?.length !== chats.length) {
         for (let i = 0; i < chats.length; i++) {
           const chatId = chats[i].chatId;
           if (!updatedUser.chatsIds?.includes(chatId!)) {
-            console.log(`Will remove ${chatId}`);
             let tempChats = [...chats];
             tempChats.splice(i, 1);
             setSearchResults(tempChats);

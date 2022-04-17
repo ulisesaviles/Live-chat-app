@@ -122,7 +122,6 @@ export async function getAllChats(
       const friendId = infoDoc?.usersIds[i];
       if (friendId !== userId) friend = await getUserDoc(friendId);
     }
-    console.log(`Chat ${chatId} with ${friend!.userName}`);
 
     // Get last message
     const chat = await getDocs(chatCollection);

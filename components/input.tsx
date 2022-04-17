@@ -45,7 +45,7 @@ interface InputProps {
     | "password";
   label: string;
   value?: string;
-  onChangeText: any;
+  onChangeText: (value: string) => void;
   placeholder: string;
   secureTextEntry?: boolean;
   noMargin?: boolean;
