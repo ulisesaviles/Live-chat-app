@@ -7,12 +7,14 @@ import {
   onSnapshot,
   getDocs,
 } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { getData } from "../config/asyncStorage";
 
 // Import db
-import { firestore } from "../config/firebase";
+import { firestore, storage } from "../config/firebase";
 
 // Import user interface
-import { User, Chat } from "../interfaces";
+import { User, Chat, Message } from "../interfaces";
 import { ConversationForHome } from "../types";
 
 // Import user functions
@@ -155,4 +157,78 @@ export async function getAllChats(
 
   // Return them
   return chats;
+}
+
+export const sendMessage = async (chatId: string, message: Message) => {
+  const chatsCollection = collection(firestore, "chats");
+  const chatsDoc = doc(chatsCollection, "chatsDoc");
+  const chatCollection = collection(chatsDoc, chatId);
+  const timestamp = (new Date()).getTime();
+  const messageDoc = doc(chatCollection, timestamp.toString());
+  let updatedMessage: Message = {...message};
+
+  if (message.type === 'img') {
+    let res: any = await fetch(message.pictureUrl!);
+    const blob = await res.blob();
+
+    const storageRef = ref(storage, `chats/${chatId}/${timestamp}`);
+    const uploadTask = uploadBytesResumable(storageRef, blob);
+
+
+    uploadTask.on("state_changed", (snapshot: any) => {}, (error: any) => console.log(error), () => {
+      getDownloadURL(uploadTask.snapshot.ref).then(async (url) => {
+        updatedMessage['pictureUrl'] = url;
+        await setDoc(messageDoc, updatedMessage);
+      });
+    });
+  }
+  else {
+    await setDoc(messageDoc, message);
+
+  }
+}
+
+export const getMessages = async (chatId: string) => {
+  const chatsCollection = collection(firestore, "chats");
+  const chatsDoc = doc(chatsCollection, "chatsDoc");
+  const chatCollection = collection(chatsDoc, chatId);
+
+  const messages = (await getDocs(chatCollection)).docs;
+  let populatedMessages: any[] = [];
+  messages.forEach( async (message) => {
+    populatedMessages.push(await message.data());
+  });
+
+  return populatedMessages;
+}
+
+export const messagesListener = async (chatId: string, callback: (messages: any) => void) => {
+  const user: any = await getData('user', true);
+
+  const chatsCollection = collection(firestore, "chats");
+  const chatsDoc = doc(chatsCollection, "chatsDoc");
+  const chatCollection = collection(chatsDoc, chatId);
+  const infoDoc: any = (await getDoc(doc(chatCollection, "info"))).data();
+
+  if (infoDoc.usersIds.find((id: any) => id === user.userId)) {
+    onSnapshot(chatCollection, async (snapshot) => {
+      let messages: any = [];
+      let added = false;
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          added = true;
+        }
+      });
+
+      if (added) {
+        await snapshot.docs.forEach(async (doc) => {
+          const message = await doc.data();
+          if (!message.usersIds) {
+            messages.push(message);
+          }
+        });
+      }
+      callback(messages);
+    });
+  }
 }

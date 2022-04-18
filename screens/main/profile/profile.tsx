@@ -25,6 +25,7 @@ import { getData } from "../../../config/asyncStorage";
 
 //Interfaces
 import { User } from "../../../interfaces";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Default react component
 export default ({navigation}: any) => {
@@ -108,10 +109,10 @@ export default ({navigation}: any) => {
     },
     title: {
       fontWeight: "600",
-      fontSize: 18,
-      marginBottom: 20,
-      marginTop: 20,
+      fontSize: 23,
       color: colors[getColorScheme()].font.primary,
+      marginBottom: 10,
+      alignSelf: "center",
     },
     profilePic: {
       width: 150,
@@ -163,11 +164,11 @@ export default ({navigation}: any) => {
 
   // React component
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
 
       <Text style={styles.title} >Settings</Text>
 
-      <Image style={styles.profilePic} source={{uri: profilePic !== '' ? profilePic : 'https://shotkit.com/wp-content/uploads/2021/06/cool-profile-pic-matheus-ferrero.jpeg'}} />
+      <Image style={styles.profilePic} source={profilePic ? {uri: profilePic} : require('../../../assets/profile.jpg')} />
 
       <TouchableOpacity onPress={chooseProfilePic}>
         <Text style={[styles.text, styles.edit]} >Edit</Text>
@@ -178,7 +179,7 @@ export default ({navigation}: any) => {
         <Text style={styles.name} >{user?.name}</Text>
       </TouchableOpacity>
 
-      <Text style={[styles.text, styles.userId]} >@AbnerSilva12</Text>
+      <Text style={[styles.text, styles.userId]} >@{user?.userName}</Text>
 
         <View style={styles.settings} >
           <TouchableOpacity onPress={() => navigation.navigate("EditProfile")}>
@@ -206,6 +207,6 @@ export default ({navigation}: any) => {
             </View>
           </TouchableOpacity>
         </View>
-    </View>
+    </SafeAreaView>
   );
 };

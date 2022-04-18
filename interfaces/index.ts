@@ -17,11 +17,12 @@ export interface User {
 
 // Message interface (to be contained in chats)
 export interface Message {
-  id: number;
+  id?: number;
   type: messageType;
   pictureUrl?: string;
   senderId: string;
   text?: string;
+  timestamp: string;
 }
 
 // Chat interface

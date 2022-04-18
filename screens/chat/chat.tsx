@@ -26,40 +26,31 @@ import { MessageComponent } from "./message";
 import { InputBox } from "./inputBox";
 import { PictureModal } from "./pictureModal";
 
+// Chat functions
+import * as ChatQueries from '../../db/chats';
+
+
 //Interfaces
 import { Message } from "../../interfaces";
 import { useNavigation } from "@react-navigation/native";
+import { getData } from "../../config/asyncStorage";
 
 
 //Message component
 
 // Default react component
-export default () => {
+export default ({route}:any) => {
   // Constants
   const navigation = useNavigation<any>();
   const [colorScheme, setColorScheme] = useState(useColorScheme());
   const [firstLoad, setFirstLoad] = useState(true);
   const [selectedPicUrl, setSelectedPicUrl] = useState('');
-  const [messages, setMessages]: any[] = useState([
-    {
-      id: '111',
-      type: 'txt',
-      text: 'Lorem ipsum',
-      senderId: '1L8oYZ1RpVS0Zw9lmL6ZOjQeeLO2'
-    },
-    {
-      id: '222',
-      type: 'txt',
-      text: 'Lorem ipsum',
-      senderId: '1L8oYZ1RpVS0Zw9lmL6ZOjQeeLO2'
-    },
-    {
-      id: '333',
-      type: 'txt',
-      text: 'Lorem ipsumip sumi ps umipsumipsumipsum ipsu mipsum ipsumi mipsum ',
-      senderId: '0DiTdAyzaVdZ3C9jay5HtIwAZnn1'
-    },
-  ]);
+  const [chat, setChat] = useState(route.params);
+  const [latestChatSize, setChatSize] = useState(0);
+  const [myUser, setMyUser]: any = useState(null);
+  const [subscription, setSubscription] = useState(true);
+
+  const [messages, setMessages]: any[] = useState([]);
 
   // Helpers
   const getColorScheme = () => {
@@ -68,24 +59,45 @@ export default () => {
     return tempColorScheme;
   };
 
-  const handleFirstLoad = () => {
+  const handleFirstLoad = async () => {
     setFirstLoad(false);
     Appearance.addChangeListener(() => {
       setColorScheme(Appearance.getColorScheme());
     });
+    const user = await getData('user', true);
+    setMyUser(user);
+    await getMessages();
   };
 
   // Functions
-  const onNewMessage = (message: Message) => {
-    setMessages([message, ...messages]);
+  const getMessages = async() => {
+    const messages = await ChatQueries.getMessages(chat.chatId);
+    setMessages(messages.slice(0, messages.length - 1).reverse());
+    setChatSize(messages.length);
   };
+  
+  const onNewMessage = async (message: Message) => {
+    if (subscription) {
+      await ChatQueries.sendMessage(chat.chatId, message);
+      await getMessages();
+    }
+  };
+
+  ChatQueries.messagesListener(chat.chatId, (msgs) => {
+    if (msgs && messages.length !== 0 && msgs.length > latestChatSize) {
+      setChatSize(msgs.length);
+      setMessages([...msgs.slice(0, msgs.length).reverse()]);
+    }
+  });
 
   // On refresh
   useEffect(() => {
     if (firstLoad) {
       handleFirstLoad();
     }
-  });
+
+    return () => (setSubscription(false));
+  }, []);
 
   // React component
   return (
@@ -100,8 +112,8 @@ export default () => {
               <Ionicons name="ios-arrow-back" style={[styles.icon, styles.backIcon]} />
             </TouchableOpacity>
             <View style={styles.flexRow} >
-              <Image style={styles.headerImage} source={{uri: 'https://shotkit.com/wp-content/uploads/2021/06/cool-profile-pic-matheus-ferrero.jpeg'}} />
-              <Text style={styles.title} >Kalia Velarde</Text>
+              <Image style={styles.headerImage} source={chat.user.pictureUrl ? {uri: chat.user.pictureUrl} : require('../../assets/profile.jpg')} />
+              <Text style={styles.title} >{chat.user.name}</Text>
             </View>
           </View>
           <View style={styles.flexRow} >
@@ -124,12 +136,14 @@ export default () => {
 
       <View style={styles.chat}>
         <FlatList
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           inverted
           data={messages}
-          renderItem={({ item }) => <MessageComponent onPressImage={setSelectedPicUrl} message={item} userId={'0DiTdAyzaVdZ3C9jay5HtIwAZnn1'} profilePictureUrl={'https://shotkit.com/wp-content/uploads/2021/06/cool-profile-pic-matheus-ferrero.jpeg'} />}
-          keyExtractor={(message: any) => message.id}
+          renderItem={({ item }) => <MessageComponent key={item.timestamp} onPressImage={setSelectedPicUrl} message={item} userId={myUser.userId} profilePictureUrl={chat.user.userId === item.senderId ? chat.user.pictureUrl : myUser?.pictureUrl} />}
+          keyExtractor={(message: any, index: number) => index.toString()}
         />
-        <InputBox userId="0DiTdAyzaVdZ3C9jay5HtIwAZnn1" onSendMessage={onNewMessage}  />
+        <InputBox userId={myUser?.userId} onSendMessage={(message: any) => subscription && onNewMessage(message)}  />
       </View>
     </>
   );

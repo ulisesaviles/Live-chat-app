@@ -8,7 +8,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as ImagePicker from 'expo-image-picker';
 
 // Theme
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     fontSize: 16,
-    color: colors[getColorScheme()].font.primary
+    color: colors['dark'].font.primary
   }
 })
 
@@ -60,6 +60,7 @@ export const InputBox = ({userId, onSendMessage}:{userId: string, onSendMessage:
   // Constants
   const [keyboardOn, toggleKeyboard] = useState(false);
   const [messageText, setText] = useState('');
+  const [subscription, setSubscription] = useState(true);
 
   //Events
   Keyboard.addListener('keyboardWillShow', () => {
@@ -104,6 +105,10 @@ export const InputBox = ({userId, onSendMessage}:{userId: string, onSendMessage:
     }
   }
 
+  useEffect(() => {
+    return () => setSubscription(false);
+  }, [])
+
   return(
     <KeyboardAvoidingView behavior="padding" >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} >
@@ -121,7 +126,7 @@ export const InputBox = ({userId, onSendMessage}:{userId: string, onSendMessage:
               placeholderTextColor={
                 colors[getColorScheme()].input.placeholder
               }
-              onChangeText={(value) => setText(value)}
+              onChangeText={(value) => subscription && setText(value)}
               value={messageText}
             />
             <TouchableOpacity

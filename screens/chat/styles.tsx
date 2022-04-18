@@ -49,7 +49,7 @@ export const styles: any = StyleSheet.create({
   
   icon: {
     fontSize: 28,
-    color: colors[getColorScheme()].font.primary
+    color: colors['dark'].font.primary
   },
   backIcon: {
     marginRight: 20
