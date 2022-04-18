@@ -18,13 +18,14 @@ import { User } from "../interfaces";
 
 // Import profile img
 import profile from "../assets/profile.jpg";
+import { getData } from "../config/asyncStorage";
 
 // Props interface
 interface props {
   user: User;
   type: "onlyName" | "withLastMessage";
   onPress?: any;
-  lastMessage?: { message: string; hour: string };
+  lastMessage?: { message: string; hour: string; senderId?: string };
   noMessage?: boolean;
   state?: string;
 }
@@ -34,6 +35,7 @@ export default ({ user, type, onPress, lastMessage, state }: props) => {
   // Constants
   const [colorScheme, setColorScheme] = useState(Appearance.getColorScheme());
   const [firstLoad, setFirstLoad] = useState(true);
+  const [myId, setMyId] = useState("");
   const dimensions = {
     height: Dimensions.get("screen").height,
     width: Dimensions.get("screen").width,
@@ -52,11 +54,13 @@ export default ({ user, type, onPress, lastMessage, state }: props) => {
     return phraseAsStr;
   };
 
-  const handleFirstLoad = () => {
+  const handleFirstLoad = async () => {
     setFirstLoad(false);
     Appearance.addChangeListener(() => {
       setColorScheme(Appearance.getColorScheme());
     });
+    const user: User = await getData("user", true);
+    setMyId(user.userId!);
   };
 
   // On refresh
@@ -74,14 +78,32 @@ export default ({ user, type, onPress, lastMessage, state }: props) => {
       height: 60,
       alignItems: "center",
     },
-    hour: {},
+    hour: {
+      color: colors[colorScheme!].font.secondary,
+    },
     img: {
       width: 50,
       height: 50,
       marginRight: 20,
       borderRadius: 100,
     },
-    message: {},
+    message: {
+      color: colors[colorScheme!].font.primary,
+      maxWidth: dimensions.width * 0.9 - 140,
+    },
+    messageContainer: {
+      flexWrap: "nowrap",
+      flexDirection: "row",
+      width: dimensions.width * 0.9 - 70,
+      maxWidth: dimensions.width * 0.9 - 70,
+      justifyContent: "space-between",
+    },
+    messageSentByMe: {
+      color: colors[colorScheme!].font.secondary,
+    },
+    messageSentByHim: {
+      color: colors[colorScheme!].font.primary,
+    },
     name: {
       color: colors[colorScheme!].font.primary,
       fontSize: 18,
@@ -119,14 +141,31 @@ export default ({ user, type, onPress, lastMessage, state }: props) => {
             <Text style={styles.state}>{state ? ` • ${state}` : null}</Text>
           </Text>
         ) : type === "withLastMessage" ? (
-          <Text style={styles.state}>
-            {lastMessage === undefined || lastMessage.message === undefined
-              ? `Say hello to ${user.name}👋`
-              : lastMessage?.message}
-            <Text style={styles.state}>
-              {lastMessage?.message ? ` • ${lastMessage?.hour}` : null}
+          <View style={styles.messageContainer}>
+            <Text
+              style={[
+                styles.message,
+                styles[
+                  myId === lastMessage?.senderId
+                    ? "messageSentByMe"
+                    : "messageSentByHim"
+                ],
+              ]}
+              numberOfLines={1}
+            >
+              {lastMessage === undefined || lastMessage.message === undefined
+                ? `Say hello to ${user.name}👋`
+                : `${myId === lastMessage.senderId ? "You: " : ""}${
+                    lastMessage?.message
+                  }`}
             </Text>
-          </Text>
+            <Text style={styles.hour}>
+              {lastMessage?.message
+                ? lastMessage?.hour
+                : // ` • ${lastMessage?.hour}`
+                  null}
+            </Text>
+          </View>
         ) : null}
       </View>
     </TouchableOpacity>
