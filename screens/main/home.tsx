@@ -209,7 +209,7 @@ export default () => {
     },
     headerTopSectionContainer: {
       width: "100%",
-      paddingTop: 20,
+      paddingTop: 5,
     },
     invisibleFooter: {
       width: "100%",
@@ -217,7 +217,7 @@ export default () => {
     },
     invisibleHeader: {
       width: "100%",
-      height: 160,
+      height: 150,
     },
     loading: {
       color: colors[getColorScheme()].font.secondary,
@@ -295,6 +295,7 @@ export default () => {
                                 chat.lastMessage.type === "img"
                                   ? "Img"
                                   : chat.lastMessage.text!,
+                              senderId: chat.lastMessage.senderId,
                             }
                           : undefined
                       }
