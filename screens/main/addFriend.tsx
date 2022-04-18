@@ -69,7 +69,8 @@ export default () => {
     setUser(user);
 
     // Get users
-    const users = await UserQueries.getAllUsers();
+    let users = await UserQueries.getAllUsers();
+    users = onlyUnknownUsers(user, users!);
 
     // Set them
     setSearchResults(users);
@@ -123,6 +124,17 @@ export default () => {
         };
     }
     setSearchResults(tempUsers);
+  };
+
+  const onlyUnknownUsers = (me: User, users: User[]): User[] => {
+    let unknownUsers: User[] = [];
+    for (let i = 0; i < users.length; i++) {
+      const user = users[i];
+      if (user.userId !== me.userId && !me.friendsIds?.includes(user.userId!)) {
+        unknownUsers.push(user);
+      }
+    }
+    return unknownUsers;
   };
 
   // On refresh
