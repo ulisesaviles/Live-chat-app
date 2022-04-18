@@ -28,13 +28,18 @@ export async function createChat(usersIds: string[]): Promise<string | null> {
     const newChatInfo: Chat = { usersIds };
 
     // Create chatId
-    const chatId: string = `${usersIds[0]}_${usersIds[1]}`;
+    let chatId: string = `${usersIds[0]}_${usersIds[1]}`;
 
     // Create info doc
     const chatsCollection = collection(firestore, "chats");
     const chatsDoc = doc(chatsCollection, "chatsDoc");
-    const chatCollection = collection(chatsDoc, chatId);
-    const infoDoc = doc(chatCollection, "info");
+    let chatCollection = collection(chatsDoc, chatId);
+    let infoDoc = doc(chatCollection, "info");
+    if (!(await getDoc(infoDoc)).exists) {
+      chatId = `${usersIds[1]}_${usersIds[0]}`;
+      chatCollection = collection(chatsDoc, chatId);
+      infoDoc = doc(chatCollection, "info");
+    }
     await setDoc(infoDoc, newChatInfo);
 
     // Return id
@@ -163,30 +168,32 @@ export const sendMessage = async (chatId: string, message: Message) => {
   const chatsCollection = collection(firestore, "chats");
   const chatsDoc = doc(chatsCollection, "chatsDoc");
   const chatCollection = collection(chatsDoc, chatId);
-  const timestamp = (new Date()).getTime();
+  const timestamp = new Date().getTime();
   const messageDoc = doc(chatCollection, timestamp.toString());
-  let updatedMessage: Message = {...message};
+  let updatedMessage: Message = { ...message };
 
-  if (message.type === 'img') {
+  if (message.type === "img") {
     let res: any = await fetch(message.pictureUrl!);
     const blob = await res.blob();
 
     const storageRef = ref(storage, `chats/${chatId}/${timestamp}`);
     const uploadTask = uploadBytesResumable(storageRef, blob);
 
-
-    uploadTask.on("state_changed", (snapshot: any) => {}, (error: any) => console.log(error), () => {
-      getDownloadURL(uploadTask.snapshot.ref).then(async (url) => {
-        updatedMessage['pictureUrl'] = url;
-        await setDoc(messageDoc, updatedMessage);
-      });
-    });
-  }
-  else {
+    uploadTask.on(
+      "state_changed",
+      (snapshot: any) => {},
+      (error: any) => console.log(error),
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then(async (url) => {
+          updatedMessage["pictureUrl"] = url;
+          await setDoc(messageDoc, updatedMessage);
+        });
+      }
+    );
+  } else {
     await setDoc(messageDoc, message);
-
   }
-}
+};
 
 export const getMessages = async (chatId: string) => {
   const chatsCollection = collection(firestore, "chats");
@@ -195,15 +202,18 @@ export const getMessages = async (chatId: string) => {
 
   const messages = (await getDocs(chatCollection)).docs;
   let populatedMessages: any[] = [];
-  messages.forEach( async (message) => {
+  messages.forEach(async (message) => {
     populatedMessages.push(await message.data());
   });
 
   return populatedMessages;
-}
+};
 
-export const messagesListener = async (chatId: string, callback: (messages: any) => void) => {
-  const user: any = await getData('user', true);
+export const messagesListener = async (
+  chatId: string,
+  callback: (messages: any) => void
+) => {
+  const user: any = await getData("user", true);
 
   const chatsCollection = collection(firestore, "chats");
   const chatsDoc = doc(chatsCollection, "chatsDoc");
@@ -215,7 +225,7 @@ export const messagesListener = async (chatId: string, callback: (messages: any)
       let messages: any = [];
       let added = false;
       snapshot.docChanges().forEach((change) => {
-        if (change.type === 'added') {
+        if (change.type === "added") {
           added = true;
         }
       });
@@ -231,4 +241,4 @@ export const messagesListener = async (chatId: string, callback: (messages: any)
       callback(messages);
     });
   }
-}
+};
