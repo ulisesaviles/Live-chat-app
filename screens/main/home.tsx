@@ -44,8 +44,6 @@ export default () => {
   const [firstLoad, setFirstLoad] = useState(true);
   const navigation = useNavigation<any>();
   const [chats, setChats]: [ConversationForHome[], any] = useState(null);
-  const [user, setUser]: [User, any] = useState(null);
-  const [users, setUsers]: [User[], any] = useState(null);
   const [searchResults, setSearchResults]: [ConversationForHome[], any] =
     useState(null);
   const [input, setInput]: [string, any] = useState("");
@@ -55,6 +53,16 @@ export default () => {
   };
 
   // Helpers
+  const getAllChats = async (
+    userId: string
+  ): Promise<ConversationForHome[]> => {
+    const chats: ConversationForHome[] = await ChatQueries.getAllChats(userId);
+    setSearchResults(chats);
+    setChats(chats);
+    await setData(chats, "chats");
+    return chats;
+  };
+
   const getColorScheme = () => {
     let tempColorScheme: ColorSchemeType = "light";
     if (colorScheme === "dark") tempColorScheme = "dark";
@@ -64,23 +72,16 @@ export default () => {
   const getConversations = async () => {
     // Get user
     const user: User = (await getData("user", true))!;
-    setUser(user);
 
     // Get all chats
-    const chats: ConversationForHome[] = await ChatQueries.getAllChats(
-      user.userId!
-    );
-    setSearchResults(chats);
-    setChats(chats);
-    await setData(chats, "chats");
+    const chats = await getAllChats(user.userId!);
 
     // Set chats listener
     UserQueries.setUserDocListener(user.userId!, async (updatedUser) => {
-      setUser(updatedUser);
       setData(updatedUser, "user");
 
-      // Check if a chat was removed
-      if (updatedUser.chatsIds?.length !== chats.length) {
+      // Check if friend was removed
+      if (updatedUser.chatsIds?.length! < chats.length) {
         for (let i = 0; i < chats.length; i++) {
           const chatId = chats[i].chatId;
           if (!updatedUser.chatsIds?.includes(chatId!)) {
@@ -92,6 +93,12 @@ export default () => {
             break;
           }
         }
+      }
+
+      // Check if friend was added
+      if (updatedUser.chatsIds?.length! > chats.length) {
+        // Get all chats
+        await getAllChats(user.userId!);
       }
 
       updatedUser.chatsIds?.forEach(async (chatId) => {
@@ -111,7 +118,7 @@ export default () => {
             else {
               for (let i = 0; i < conversations.length; i++) {
                 const chat = conversations[i];
-                if (chat.chatId === newChat.chatId) conversations[i] = chat;
+                if (chat.chatId === newChat.chatId) conversations[i] = newChat;
               }
             }
 
@@ -164,7 +171,17 @@ export default () => {
 
   const timestampToHour = (timestamp: number): string => {
     const date = new Date(timestamp);
-    return `${date.getHours()}:${date.getMinutes()}`;
+    let hours: string | number = date.getHours();
+    let time = "am";
+    if (hours > 12) {
+      hours = hours - 12;
+      time = "pm";
+    } else if (hours === 0) {
+      hours = "00";
+    }
+    let minutes = date.getMinutes().toString();
+    if (minutes === "0") minutes = "00";
+    return `${hours}:${minutes} ${time}`;
   };
 
   // On refresh
