@@ -138,6 +138,7 @@ export async function getAllChats(
           text?: string;
           timestamp: number;
           type: "txt" | "img";
+          senderId?: string;
         }
       | undefined = undefined;
     if (messages.length > 1) {
