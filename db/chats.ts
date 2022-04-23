@@ -6,6 +6,7 @@ import {
   collection,
   onSnapshot,
   getDocs,
+  deleteDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { getData } from "../config/asyncStorage";
@@ -230,5 +231,22 @@ export const messagesListener = async (chatId: string, callback: (messages: any)
       }
       callback(messages);
     });
+  }
+}
+
+export const clearChat = async(chatId: string) => {
+  const user: any = await getData('user', true);
+
+  const chatsCollection = collection(firestore, "chats");
+  const chatsDoc = doc(chatsCollection, "chatsDoc");
+  const chatCollection = collection(chatsDoc, chatId);
+  const infoDoc: any = (await getDoc(doc(chatCollection, "info"))).data();
+
+  if (infoDoc.usersIds.find((id: any) => id === user.userId)) {
+    const docs = (await getDocs(chatCollection)).docs.map(doc => doc.ref);
+    console.log(docs);
+    // docs.forEach((doc: any) => {
+    //   deleteDoc(doc);
+    // })
   }
 }

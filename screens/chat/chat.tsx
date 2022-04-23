@@ -1,5 +1,5 @@
 // React native imports
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Text,
   View,
@@ -10,6 +10,7 @@ import {
   Image,
   FlatList
 } from "react-native";
+import ActionSheet from "react-native-actionsheet";
 
 // Theme
 import colors from "../../config/colors";
@@ -51,6 +52,7 @@ export default ({route}:any) => {
   const [subscription, setSubscription] = useState(true);
 
   const [messages, setMessages]: any[] = useState([]);
+  const clearChatRef: any = useRef();
 
   // Helpers
   const getColorScheme = () => {
@@ -89,6 +91,22 @@ export default ({route}:any) => {
       setMessages([...msgs.slice(0, msgs.length).reverse()]);
     }
   });
+
+  const handleClearChat = async(response: number) => {
+    enum Actions {
+      CLEAR_CHAT = 0,
+      CLOSE = 1
+    }
+
+    if (response === Actions.CLEAR_CHAT) {
+      ChatQueries.clearChat(chat.chatId);
+      navigation.goBack();
+    }
+  };
+
+  const showClearChatActionSheet = () => {
+    clearChatRef.current.show();
+  }
 
   // On refresh
   useEffect(() => {
@@ -129,7 +147,9 @@ export default ({route}:any) => {
                 </LinearGradient>
               </View>
             </TouchableOpacity>
-            <MaterialIcons name="more-vert" style={styles.icon} />
+            <TouchableOpacity onPress={showClearChatActionSheet}>
+              <MaterialIcons name="more-vert" style={styles.icon} />
+            </TouchableOpacity>
           </View>
         </View>
       </SafeAreaView>
@@ -144,6 +164,14 @@ export default ({route}:any) => {
           keyExtractor={(message: any, index: number) => index.toString()}
         />
         <InputBox userId={myUser?.userId} onSendMessage={(message: any) => subscription && onNewMessage(message)}  />
+        <ActionSheet
+        ref={clearChatRef}
+        title="Do you want to clear this chat for you and your friend?"
+        options={["Clear chat", "Close"]}
+        cancelButtonIndex={1}
+        destructiveButtonIndex={0}
+        onPress={handleClearChat}
+      />
       </View>
     </>
   );
