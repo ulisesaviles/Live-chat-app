@@ -244,9 +244,11 @@ export const clearChat = async(chatId: string) => {
 
   if (infoDoc.usersIds.find((id: any) => id === user.userId)) {
     const docs = (await getDocs(chatCollection)).docs.map(doc => doc.ref);
-    console.log(docs);
-    // docs.forEach((doc: any) => {
-    //   deleteDoc(doc);
-    // })
+    docs.forEach( async (doc: any) => {
+      const docId = (await getDoc(doc)).id;
+      if (docId !== 'info') {
+        await deleteDoc(doc);
+      }
+    })
   }
 }
