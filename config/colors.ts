@@ -6,6 +6,7 @@ export default {
       primary: "rgb(251, 251, 251)",
       secondary: "rgb(180, 180, 180)",
       accent: "rgb(45, 112, 243)",
+      danger: "rgb(242, 98, 73)"
     },
     input: {
       background: "rgb(31, 38, 43)",
@@ -38,6 +39,7 @@ export default {
       primary: "rgb(0, 0, 0)",
       secondary: "rgb(125, 125, 125)",
       accent: "rgb(45, 112, 243)",
+      danger: "rgb(243, 55, 45)"
     },
     input: {
       background: "rgb(241, 241, 241)",
