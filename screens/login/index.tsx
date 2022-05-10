@@ -16,7 +16,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { getActionFromState, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 
 // Expo imports
 import { LinearGradient } from "expo-linear-gradient";
@@ -27,6 +27,9 @@ import { ColorSchemeType } from "../../types";
 
 // User queries
 import * as UserQueries from "../../db/users";
+
+// Config imports
+import { getData, setData } from "../../config/asyncStorage";
 
 // Default react component
 export default () => {
@@ -49,11 +52,18 @@ export default () => {
     return tempColorScheme;
   };
 
-  const handleFirstLoad = () => {
+  const handleFirstLoad = async () => {
     setFirstLoad(false);
     Appearance.addChangeListener(() => {
       setColorScheme(Appearance.getColorScheme());
     });
+
+    // Check if he has been welcomed
+    const hasBeenWelcomed = await getData("hasBeenWelcomed", false);
+    if (!hasBeenWelcomed) {
+      navigation.navigate("Welcome");
+      await setData("true", "hasBeenWelcomed");
+    }
   };
 
   const isAValidEmail = (email: string) => {
