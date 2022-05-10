@@ -35,6 +35,7 @@ import * as ChatQueries from '../../db/chats';
 import { Message } from "../../interfaces";
 import { useNavigation } from "@react-navigation/native";
 import { getData } from "../../config/asyncStorage";
+import { ProfileModal } from "./profileModal";
 
 
 //Message component
@@ -108,6 +109,10 @@ export default ({route}:any) => {
     clearChatRef.current.show();
   }
 
+  const openProfileModal = () => {
+    navigation.navigate('FriendProfile', { userId: chat.user.userId });
+  };
+
   // On refresh
   useEffect(() => {
     if (firstLoad) {
@@ -129,10 +134,10 @@ export default ({route}:any) => {
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Ionicons name="ios-arrow-back" style={[styles.icon, styles.backIcon]} />
             </TouchableOpacity>
-            <View style={styles.flexRow} >
+            <TouchableOpacity style={styles.flexRow} onPress={openProfileModal} >
               <Image style={styles.headerImage} source={chat.user.pictureUrl ? {uri: chat.user.pictureUrl} : require('../../assets/profile.jpg')} />
               <Text style={styles.title} >{chat.user.name}</Text>
-            </View>
+            </TouchableOpacity>
           </View>
           <View style={styles.flexRow} >
             <TouchableOpacity onPress={() => navigation.navigate('Call', {callState: CallStates.WAITING})} >

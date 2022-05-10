@@ -12,6 +12,8 @@ import Call from "./screens/call/call";
 import Welcome from "./screens/login/welcome";
 import AddFriend from "./screens/main/addFriend";
 import SignUp from "./screens/login/SignUp";
+import { ProfileModal } from "./screens/chat/profileModal";
+import { TransitionPresets } from "@react-navigation/stack";
 
 // Default react component to export
 export default () => (
@@ -36,6 +38,11 @@ export default () => (
         name="Chat"
         component={Chat}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="FriendProfile"
+        component={ProfileModal}
+        options={{ headerShown: false, ...TransitionPresets.ModalSlideFromBottomIOS, gestureEnabled: true, presentation: 'modal'  }}
       />
       <Stack.Screen
         name="Call"
