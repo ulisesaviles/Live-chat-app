@@ -22,6 +22,7 @@ export default {
       supportsTablet: true,
     },
     android: {
+      package: "com.cetys.liveChatApp",
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
         backgroundColor: "#FFFFFF",
@@ -39,6 +40,9 @@ export default {
       appId: process.env.APP_ID,
       measurementId: process.env.MEASUREMENT_ID,
     },
+    plugins: [
+      "@config-plugins/react-native-webrtc"
+    ],
     userInterfaceStyle: "automatic",
   },
 };

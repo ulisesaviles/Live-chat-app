@@ -18,7 +18,7 @@ import { useEffect, useRef, useState } from "react";
 import WebRTCHelper from "./config/webRTC";
 import { getCallRef, getMyCalleeRef } from "./db/call";
 import { onSnapshot } from "firebase/firestore";
-import { mediaDevices, RTCPeerConnection } from "react-native-webrtc";
+// import { mediaDevices, RTCPeerConnection } from "react-native-webrtc";
 
 // Default react component to export
 export default () => {
@@ -43,8 +43,8 @@ export default () => {
   }, []);
 
   const setupWebRTC = async () => {
-    pc.current = new RTCPeerConnection(configuration);
-    const stream =  WebRTCHelper.getStream();
+    // pc.current = new RTCPeerConnection(configuration);
+    // const stream =  WebRTCHelper.getStream();
     // console.log(stream);
 
     // if (stream) {

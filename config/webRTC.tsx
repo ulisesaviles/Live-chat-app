@@ -5,18 +5,6 @@ export default class WebRTCHelper {
 
   static getStream = async () => {
     let isFront = true;
-    // await navigator.mediaDevices.getUserMedia({
-    //   audio: true,
-    //   video: {
-    //     width: 640,
-    //     height: 480,
-    //     frameRate: 30,
-    //     facingMode: (isFront ? "user" : "environment"),
-    //     deviceId: videoSource3Id
-    //   }
-    // });   
-    // let devices = await navigator.mediaDevices.enumerateDevices();   
-    // console.log(devices); 
     const sourceInfos: any = await navigator.mediaDevices.enumerateDevices();
 
     let videoSourceId;
