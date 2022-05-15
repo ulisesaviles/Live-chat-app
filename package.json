@@ -10,11 +10,14 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@config-plugins/react-native-webrtc": "^3.0.0",
     "@react-native-async-storage/async-storage": "~1.15.0",
     "@react-navigation/bottom-tabs": "^6.3.1",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/native-stack": "^6.6.1",
     "@react-navigation/stack": "^6.2.1",
+    "@types/react-native-webrtc": "^1.75.5",
+    "connectycube": "^3.18.0",
     "dotenv": "^16.0.0",
     "expo": "~44.0.0",
     "expo-blur": "~11.0.0",
@@ -27,11 +30,13 @@
     "react-dom": "17.0.1",
     "react-native": "0.64.3",
     "react-native-actionsheet": "^2.4.2",
+    "react-native-connectycube": "^3.18.0",
     "react-native-gesture-handler": "^2.4.2",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.10.1",
     "react-native-swipe-gestures": "^1.0.5",
-    "react-native-web": "0.17.1"
+    "react-native-web": "0.17.1",
+    "react-native-webrtc": "^1.100.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
