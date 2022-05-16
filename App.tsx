@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from "react";
 import WebRTCHelper from "./config/webRTC";
 import { getCallRef, getMyCalleeRef } from "./db/call";
 import { onSnapshot } from "firebase/firestore";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 // import { mediaDevices, RTCPeerConnection } from "react-native-webrtc";
 
 // Default react component to export
@@ -85,54 +86,56 @@ export default () => {
   };
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Root"
-          component={Root}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{ headerShown: false, gestureEnabled: false }}
-        />
-        <Stack.Screen
-          name="Main"
-          component={Main}
-          options={{ headerShown: false, gestureEnabled: false }}
-        />
-        <Stack.Screen
-          name="Chat"
-          component={Chat}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="FriendProfile"
-          component={ProfileModal}
-          options={{ headerShown: false, ...TransitionPresets.ModalSlideFromBottomIOS, gestureEnabled: true, presentation: 'modal'  }}
-        />
-        <Stack.Screen
-          name="Call"
-          component={Call}
-          options={{ headerShown: false, gestureEnabled: false }}
-        />
-        <Stack.Screen
-          name="Welcome"
-          component={Welcome}
-          options={{ headerShown: false, presentation: "modal" }}
-        />
-        <Stack.Screen
-          name="SignUp"
-          component={SignUp}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="AddFriend"
-          component={AddFriend}
-          options={{ headerShown: false, presentation: "modal" }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <GestureHandlerRootView>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Root"
+            component={Root}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{ headerShown: false, gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="Main"
+            component={Main}
+            options={{ headerShown: false, gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="Chat"
+            component={Chat}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="FriendProfile"
+            component={ProfileModal}
+            options={{ headerShown: false, ...TransitionPresets.ModalSlideFromBottomIOS, gestureEnabled: true, presentation: 'modal'  }}
+          />
+          <Stack.Screen
+            name="Call"
+            component={Call}
+            options={{ headerShown: false, gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="Welcome"
+            component={Welcome}
+            options={{ headerShown: false, presentation: "modal" }}
+          />
+          <Stack.Screen
+            name="SignUp"
+            component={SignUp}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="AddFriend"
+            component={AddFriend}
+            options={{ headerShown: false, presentation: "modal" }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   )
 };
