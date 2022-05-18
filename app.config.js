@@ -23,6 +23,7 @@ export default {
     },
     android: {
       package: "com.cetys.liveChatApp",
+      versionCode: 1,
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
         backgroundColor: "#FFFFFF",
