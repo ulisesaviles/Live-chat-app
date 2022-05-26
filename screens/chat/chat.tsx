@@ -1,5 +1,5 @@
 // React native imports
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Text,
   View,
@@ -10,6 +10,7 @@ import {
   Image,
   FlatList
 } from "react-native";
+import ActionSheet from "react-native-actionsheet";
 
 // Theme
 import colors from "../../config/colors";
@@ -34,6 +35,7 @@ import * as ChatQueries from '../../db/chats';
 import { Message } from "../../interfaces";
 import { useNavigation } from "@react-navigation/native";
 import { getData } from "../../config/asyncStorage";
+import { ProfileModal } from "./profileModal";
 
 
 //Message component
@@ -51,6 +53,7 @@ export default ({route}:any) => {
   const [subscription, setSubscription] = useState(true);
 
   const [messages, setMessages]: any[] = useState([]);
+  const clearChatRef: any = useRef();
 
   // Helpers
   const getColorScheme = () => {
@@ -90,6 +93,26 @@ export default ({route}:any) => {
     }
   });
 
+  const handleClearChat = async(response: number) => {
+    enum Actions {
+      CLEAR_CHAT = 0,
+      CLOSE = 1
+    }
+
+    if (response === Actions.CLEAR_CHAT) {
+      ChatQueries.clearChat(chat.chatId);
+      navigation.goBack();
+    }
+  };
+
+  const showClearChatActionSheet = () => {
+    clearChatRef.current.show();
+  }
+
+  const openProfileModal = () => {
+    navigation.navigate('FriendProfile', { userId: chat.user.userId });
+  };
+
   // On refresh
   useEffect(() => {
     if (firstLoad) {
@@ -111,10 +134,10 @@ export default ({route}:any) => {
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Ionicons name="ios-arrow-back" style={[styles.icon, styles.backIcon]} />
             </TouchableOpacity>
-            <View style={styles.flexRow} >
+            <TouchableOpacity style={styles.flexRow} onPress={openProfileModal} >
               <Image style={styles.headerImage} source={chat.user.pictureUrl ? {uri: chat.user.pictureUrl} : require('../../assets/profile.jpg')} />
               <Text style={styles.title} >{chat.user.name}</Text>
-            </View>
+            </TouchableOpacity>
           </View>
           <View style={styles.flexRow} >
             <TouchableOpacity onPress={() => navigation.navigate('Call', {callState: CallStates.WAITING})} >
@@ -129,7 +152,9 @@ export default ({route}:any) => {
                 </LinearGradient>
               </View>
             </TouchableOpacity>
-            <MaterialIcons name="more-vert" style={styles.icon} />
+            <TouchableOpacity onPress={showClearChatActionSheet}>
+              <MaterialIcons name="more-vert" style={styles.icon} />
+            </TouchableOpacity>
           </View>
         </View>
       </SafeAreaView>
@@ -144,6 +169,14 @@ export default ({route}:any) => {
           keyExtractor={(message: any, index: number) => index.toString()}
         />
         <InputBox userId={myUser?.userId} onSendMessage={(message: any) => subscription && onNewMessage(message)}  />
+        <ActionSheet
+        ref={clearChatRef}
+        title="Do you want to clear this chat for you and your friend?"
+        options={["Clear chat", "Close"]}
+        cancelButtonIndex={1}
+        destructiveButtonIndex={0}
+        onPress={handleClearChat}
+      />
       </View>
     </>
   );
