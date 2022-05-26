@@ -121,6 +121,7 @@ export default ({ user, type, onPress, lastMessage, state }: props) => {
     userName: {
       color: colors[colorScheme!].font.accent,
       fontWeight: "500",
+      maxWidth: dimensions.width * 0.9 - 70,
     },
   });
 
@@ -136,7 +137,7 @@ export default ({ user, type, onPress, lastMessage, state }: props) => {
           {capitalize(user.name!)}
         </Text>
         {type === "onlyName" ? (
-          <Text style={styles.userName}>
+          <Text style={styles.userName} numberOfLines={1}>
             @{user.userName}
             <Text style={styles.state}>{state ? ` • ${state}` : null}</Text>
           </Text>
