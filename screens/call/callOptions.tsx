@@ -1,9 +1,6 @@
 import { Appearance, Dimensions, SafeAreaView, StyleSheet, View } from 'react-native';
 import { BlurView } from "expo-blur";
 
-
-import colors from '../../config/colors';
-
 import { InCallOptions } from '../../types';
 
 // Components
@@ -28,7 +25,7 @@ const styles = StyleSheet.create({
   }
 });
 
-export const CallOptions = ({onPressOption, incomingCall}:{onPressOption: any, incomingCall?: boolean}): JSX.Element => {
+export const CallOptions = ({onPressOption, incomingCall, video = false, audio = false}:{onPressOption: any, incomingCall?: boolean, video?: boolean, audio?: boolean}): JSX.Element => {
 
 
   return(
@@ -48,8 +45,8 @@ export const CallOptions = ({onPressOption, incomingCall}:{onPressOption: any, i
             !incomingCall
             ?
             <>
-              <RoundButton name={InCallOptions.VIDEO} onPress={() => onPressOption(InCallOptions.VIDEO)} />
-              <RoundButton name={InCallOptions.AUDIO} onPress={() => onPressOption(InCallOptions.AUDIO)} />
+              <RoundButton name={InCallOptions.VIDEO} on={video} onPress={() => onPressOption(InCallOptions.VIDEO)} />
+              <RoundButton name={InCallOptions.AUDIO} on={audio} onPress={() => onPressOption(InCallOptions.AUDIO)} />
               <RoundButton name={InCallOptions.SWAP} onPress={() => onPressOption(InCallOptions.SWAP)} />
               <RoundButton name={InCallOptions.END_CALL} onPress={() => onPressOption(InCallOptions.END_CALL)} />
             </>

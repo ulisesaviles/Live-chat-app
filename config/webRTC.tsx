@@ -1,11 +1,11 @@
-// import mediaDevices from "react-native-webrtc";
+import {mediaDevices} from "react-native-webrtc";
 
 export default class WebRTCHelper {
   constructor() {}
 
   static getStream = async () => {
     let isFront = true;
-    const sourceInfos: any = await navigator.mediaDevices.enumerateDevices();
+    const sourceInfos: any = await mediaDevices.enumerateDevices();
 
     let videoSourceId;
     for (let i = 0; i < sourceInfos.length; i++) {
@@ -14,7 +14,7 @@ export default class WebRTCHelper {
         videoSourceId = sourceInfo.deviceId;
       }
     }
-    const stream = navigator.mediaDevices.getUserMedia({
+    const stream: any = await mediaDevices.getUserMedia({
       audio: true,
       video: {
         width: 640,
@@ -26,5 +26,33 @@ export default class WebRTCHelper {
     });
 
     return typeof stream !== 'boolean' && stream;
+  }
+
+  static swapCamera = (stream: MediaStream) => {
+    stream.getVideoTracks().forEach((track: any) => {
+      track._switchCamera();
+    })
+  }
+
+  static toggleVideo = (stream: MediaStream) => {
+    stream.getVideoTracks().forEach((track) => {
+      if (track.enabled) {
+        track.enabled = false;
+      }
+      else {
+        track.enabled = true;
+      }
+    });
+  }
+
+  static toggleAudio = (stream: MediaStream) => {
+    stream.getAudioTracks().forEach((track) => {
+      if (track.enabled) {
+        track.enabled = false;
+      }
+      else {
+        track.enabled = true;
+      }
+    });
   }
 }

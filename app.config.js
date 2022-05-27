@@ -41,9 +41,7 @@ export default {
       appId: process.env.APP_ID,
       measurementId: process.env.MEASUREMENT_ID,
     },
-    plugins: [
-      "@config-plugins/react-native-webrtc"
-    ],
     userInterfaceStyle: "automatic",
+    plugins: ["@config-plugins/react-native-webrtc"]
   },
 };

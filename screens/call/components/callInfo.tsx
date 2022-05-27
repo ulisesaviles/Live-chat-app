@@ -1,5 +1,6 @@
 import { StyleSheet, View, Image, Text } from "react-native";
 import colors from "../../../config/colors";
+import profile from "../../../assets/profile.jpg";
 
 const styles = StyleSheet.create({
   vertical: {
@@ -39,7 +40,7 @@ export const CallInfo = ({position, profilePictureUrl, callTime}: CallInfoProps)
     <View style={position === 'horizontal' ? styles.horizontal : styles.vertical} >
       <Image
         style={position === 'horizontal' ? styles.horizontalProfilePic : styles.profilePic}
-        source={{uri: profilePictureUrl}}
+        source={ profilePictureUrl ? {uri: profilePictureUrl} : profile}
       />
       <Text style={styles.callTime} >{callTime}</Text>
     </View>

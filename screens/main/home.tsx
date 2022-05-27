@@ -35,7 +35,9 @@ import { User } from "../../interfaces";
 import { getData, setData } from "../../config/asyncStorage";
 
 // Types
-import { ColorSchemeType, ConversationForHome } from "../../types";
+import { CallStates, ColorSchemeType, ConversationForHome } from "../../types";
+import { getCallCollectionRef } from "../../db/call";
+import { onSnapshot } from "@firebase/firestore";
 
 // Default react component
 export default () => {
@@ -184,12 +186,37 @@ export default () => {
     return `${hours}:${minutes} ${time}`;
   };
 
+  
+
   // On refresh
   useEffect(() => {
     if (firstLoad) {
       handleFirstLoad();
     }
-  });
+    const callCollectionRef = getCallCollectionRef();
+
+    const user = getData('user', true);
+
+    // Set a listener on the calls collection and check if a new doc containing user's id is added
+    user.then((userData: any) => {
+      onSnapshot(callCollectionRef, (snapshot) => {
+        snapshot.docChanges().forEach( async (change) => {
+          if (change.doc.id.includes(`_${userData!.userId}`) && change.type === 'added') {
+
+            //Get remote user data
+            const remoteUserId = change.doc.id.split('_')[0];
+
+            const remoteUser = await UserQueries.getUserDoc(remoteUserId);
+
+            // Trigger call incoming
+            navigation.navigate("Call", {callState: CallStates.INCOMING_CALL, user: remoteUser});
+          }
+        })
+      });
+    });
+
+
+  }, []);
 
   // Styles
   const styles = StyleSheet.create({

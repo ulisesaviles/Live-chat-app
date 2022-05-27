@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  useColorScheme,
 } from "react-native";
 import { useEffect, useState } from "react";
 import * as ImagePicker from 'expo-image-picker';
@@ -17,50 +18,28 @@ import colors from "../../config/colors";
 // Icons
 import { Ionicons } from '@expo/vector-icons';
 import { Message } from "../../interfaces";
-
-const getColorScheme = () => {
-  return Appearance.getColorScheme() || 'dark';
-};
-
-const styles = StyleSheet.create({
-  inputBox: {
-    backgroundColor: colors[getColorScheme()].input.background,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    fontSize: 18,
-    borderRadius: 10,
-    flexDirection: 'row',
-    alignItems:'center',
-    justifyContent: 'space-between',
-    marginBottom: 20
-  },
-  input: {
-    flex: 1,
-    backgroundColor: colors[getColorScheme()].input.background,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    fontSize: 18,
-    borderRadius: 10,
-    color: colors[getColorScheme()].font.primary,
-    maxHeight: 104
-  },
-
-  button: {
-    borderRadius: 100,
-    padding: 8,
-    backgroundColor: colors[getColorScheme()].card,
-  },
-  icon: {
-    fontSize: 16,
-    color: colors['dark'].font.primary
-  }
-})
+import { ColorSchemeType } from "../../types";
 
 export const InputBox = ({userId, onSendMessage}:{userId: string, onSendMessage: any}): JSX.Element => {
   // Constants
   const [keyboardOn, toggleKeyboard] = useState(false);
   const [messageText, setText] = useState('');
   const [subscription, setSubscription] = useState(true);
+  const [firstLoad, setFirstLoad] = useState(true);
+  const [colorScheme, setColorScheme] = useState(useColorScheme());
+
+  const getColorScheme = () => {
+    let tempColorScheme: ColorSchemeType = "light";
+    if (colorScheme === "dark") tempColorScheme = "dark";
+    return tempColorScheme;
+  };
+
+  const handleFirstLoad = () => {
+    setFirstLoad(false);
+    Appearance.addChangeListener(() => {
+      setColorScheme(Appearance.getColorScheme());
+    });
+  };
 
   //Events
   Keyboard.addListener('keyboardWillShow', () => {
@@ -105,9 +84,48 @@ export const InputBox = ({userId, onSendMessage}:{userId: string, onSendMessage:
     }
   }
 
+  // On refresh
   useEffect(() => {
-    return () => setSubscription(false);
-  }, [])
+    if (firstLoad) {
+      handleFirstLoad();
+    }
+
+    return () => (setSubscription(false));
+  }, []);
+
+  const styles = StyleSheet.create({
+    inputBox: {
+      backgroundColor: colors[getColorScheme()].input.background,
+      paddingVertical: 8,
+      paddingHorizontal: 10,
+      fontSize: 18,
+      borderRadius: 10,
+      flexDirection: 'row',
+      alignItems:'center',
+      justifyContent: 'space-between',
+      marginBottom: 20
+    },
+    input: {
+      flex: 1,
+      backgroundColor: colors[getColorScheme()].input.background,
+      paddingVertical: 8,
+      paddingHorizontal: 10,
+      fontSize: 18,
+      borderRadius: 10,
+      color: colors[getColorScheme()].font.primary,
+      maxHeight: 104
+    },
+  
+    button: {
+      borderRadius: 100,
+      padding: 8,
+      backgroundColor: getColorScheme() === 'dark' ? colors[getColorScheme()].card : colors['light'].background,
+    },
+    icon: {
+      fontSize: 16,
+      color: colors[getColorScheme()].font.primary
+    }
+  });
 
   return(
     <KeyboardAvoidingView behavior="padding" >
@@ -135,12 +153,12 @@ export const InputBox = ({userId, onSendMessage}:{userId: string, onSendMessage:
                 [
                   styles.button,
                   {
-                    backgroundColor: messageText !== '' ? colors[getColorScheme()].font.accent : colors[getColorScheme()].font.secondary 
+                    backgroundColor: messageText !== '' ? colors[getColorScheme()].font.accent : colors[getColorScheme()].card 
                   }
                 ]
               }
               onPress={onSendText} >
-                <Ionicons name="ios-send" style={styles.icon} />
+                <Ionicons name="ios-send" style={[styles.icon, messageText !== '' && {color: colors['dark'].font.primary}]} />
             </TouchableOpacity>
           </View>
         </View>

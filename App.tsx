@@ -14,79 +14,10 @@ import AddFriend from "./screens/main/addFriend";
 import SignUp from "./screens/login/SignUp";
 import { ProfileModal } from "./screens/chat/profileModal";
 import { TransitionPresets } from "@react-navigation/stack";
-import { useEffect, useRef, useState } from "react";
-import WebRTCHelper from "./config/webRTC";
-import { getCallRef, getMyCalleeRef } from "./db/call";
-import { onSnapshot } from "firebase/firestore";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-// import { mediaDevices, RTCPeerConnection } from "react-native-webrtc";
 
 // Default react component to export
 export default () => {
-  const configuration: any = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
-  const [localStream, setLocalStream] = useState <MediaStream | null>();
-  const [remoteStream, setRemoteStream] = useState<MediaStream | null>();
-  const [gettingCall, setGettingCall] = useState(false);
-  const pc: any = useRef<RTCPeerConnection>();
-  const connecting = useRef(false);
-
-  useEffect(() => {
-    // getMyCalleeRef().then(ref => {
-    //   if (ref) {
-    //     onSnapshot(ref, (data) => {
-    //       console.log(data);
-    //     });
-    //   }
-    // });
-
-    setupWebRTC();
-
-  }, []);
-
-  const setupWebRTC = async () => {
-    // pc.current = new RTCPeerConnection(configuration);
-    // const stream =  WebRTCHelper.getStream();
-    // console.log(stream);
-
-    // if (stream) {
-    //   setLocalStream(stream);
-    //   pc.current.addStream(stream);
-
-    // }
-  };
-
-  const createCall = async () => {
-    connecting.current = true;
-
-    await setupWebRTC();
-
-    const cRef = getCallRef();
-
-    collectIceCandidates(cRef, 'caller', 'callee');
-
-    if (pc.current) {
-      const offer = pc.current.createOffer();
-
-      pc.current.setLocalDescription(offer);
-
-      const cWithOffer = { offer };
-    }
-  };
-
-  const collectIceCandidates = (cRef: any, localname: string, remoteName: string) => {
-    const candidateCollection = cRef.collection(localname);
-
-    if (pc.current) {
-      pc.current.onicecandidate = (event: any) => {
-        if (event.candidate) {
-          candidateCollection.add(event.candidate);
-        }
-      }
-    }
-  };
-
   return (
-    <GestureHandlerRootView>
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen
@@ -136,6 +67,5 @@ export default () => {
           />
         </Stack.Navigator>
       </NavigationContainer>
-    </GestureHandlerRootView>
   )
 };

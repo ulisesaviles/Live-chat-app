@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Text,
+  StyleSheet,
   View,
   Appearance,
   useColorScheme,
@@ -16,7 +17,6 @@ import ActionSheet from "react-native-actionsheet";
 import colors from "../../config/colors";
 import { CallStates, ColorSchemeType } from "../../types";
 import { LinearGradient } from "expo-linear-gradient";
-import { styles } from "./styles";
 
 // Icons
 import { Ionicons } from '@expo/vector-icons';
@@ -35,10 +35,6 @@ import * as ChatQueries from '../../db/chats';
 import { Message } from "../../interfaces";
 import { useNavigation } from "@react-navigation/native";
 import { getData } from "../../config/asyncStorage";
-import { ProfileModal } from "./profileModal";
-
-
-//Message component
 
 // Default react component
 export default ({route}:any) => {
@@ -62,14 +58,12 @@ export default ({route}:any) => {
     return tempColorScheme;
   };
 
-  const handleFirstLoad = async () => {
+  const handleFirstLoad = () => {
     setFirstLoad(false);
     Appearance.addChangeListener(() => {
       setColorScheme(Appearance.getColorScheme());
     });
-    const user = await getData('user', true);
-    setMyUser(user);
-    await getMessages();
+    getMessages();
   };
 
   // Functions
@@ -117,10 +111,70 @@ export default ({route}:any) => {
   useEffect(() => {
     if (firstLoad) {
       handleFirstLoad();
+      getData('user', true).then((userData: any) => setMyUser(userData))
     }
 
     return () => (setSubscription(false));
   }, []);
+
+  const styles: any = StyleSheet.create({
+    chat: {
+      flex: 1,
+      backgroundColor: colors[getColorScheme()].background,
+      padding: 20
+    },
+    loading: {
+      color: colors[getColorScheme()].font.primary,
+    },
+    title: {
+      fontWeight: "600",
+      fontSize: 18,
+      color: colors[getColorScheme()].font.primary,
+    },
+  
+    areaView: {
+      backgroundColor: colors[getColorScheme()].background
+    },
+  
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      width: "100%",
+      paddingTop: 20,
+      paddingLeft: 20,
+      paddingRight: 20,
+      backgroundColor: colors[getColorScheme()].background
+    },
+    
+    flexRow: {
+      flexDirection: "row",
+      alignItems: 'center'
+    },
+    
+    headerImage: {
+      width: 38,
+      height: 38,
+      borderRadius: 1000,
+      marginRight: 10
+    },
+    
+    icon: {
+      fontSize: 28,
+      color: colors[getColorScheme()].font.primary
+    },
+    backIcon: {
+      marginRight: 20
+    },
+    gradientBtn: {
+      borderRadius: 20,
+      overflow: 'hidden'
+    },
+    callIconSize: {
+      fontSize: 16,
+      borderRadius: 100
+    },
+  });
 
   // React component
   return (
@@ -140,14 +194,14 @@ export default ({route}:any) => {
             </TouchableOpacity>
           </View>
           <View style={styles.flexRow} >
-            <TouchableOpacity onPress={() => navigation.navigate('Call', {callState: CallStates.WAITING})} >
+            <TouchableOpacity onPress={() => navigation.navigate('Call', {callState: CallStates.WAITING, user: chat.user})} >
               <View style={styles.gradientBtn}>
                 <LinearGradient
                   colors={colors[getColorScheme()].gradients.main}
                   style={{paddingVertical: 6, paddingHorizontal: 7,}}
                 >
                   <View>
-                    <Ionicons name="ios-call" style={[styles.icon, styles.callIconSize]} />
+                    <Ionicons name="ios-call" style={[styles.icon, styles.callIconSize, {color: colors['dark'].font.primary}]} />
                   </View>
                 </LinearGradient>
               </View>
@@ -165,7 +219,7 @@ export default ({route}:any) => {
           showsHorizontalScrollIndicator={false}
           inverted
           data={messages}
-          renderItem={({ item }) => <MessageComponent key={item.timestamp} onPressImage={setSelectedPicUrl} message={item} userId={myUser.userId} profilePictureUrl={chat.user.userId === item.senderId ? chat.user.pictureUrl : myUser?.pictureUrl} />}
+          renderItem={({ item }) => <MessageComponent key={item.timestamp} onPressImage={setSelectedPicUrl} message={item} userId={myUser?.userId} profilePictureUrl={chat.user.userId === item.senderId ? chat.user.pictureUrl : myUser?.pictureUrl} />}
           keyExtractor={(message: any, index: number) => index.toString()}
         />
         <InputBox userId={myUser?.userId} onSendMessage={(message: any) => subscription && onNewMessage(message)}  />

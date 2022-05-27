@@ -59,7 +59,6 @@ interface MessageProps {
 }
 export const MessageComponent = ({message, userId, profilePictureUrl, onPressImage }: MessageProps) => {
   const senderIsNotSelf = userId !== message.senderId;
-  console.log(profilePictureUrl);
 
   return(
     <View style={{ marginBottom: 20}}>

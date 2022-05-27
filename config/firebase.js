@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 
 // Firestore (data base's) imports
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 // Auth imports
@@ -20,7 +20,9 @@ const firebaseConfig = {
   appId: Constants.manifest.extra.appId,
   measurementId: Constants.manifest.extra.measurementId,
 };
-initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+
+initializeFirestore(app, {experimentalForceLongPolling: true});
 
 export const firestore = getFirestore();
 
