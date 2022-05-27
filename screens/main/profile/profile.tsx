@@ -94,7 +94,7 @@ export default ({ navigation }: any) => {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors[getColorScheme()].background,
+      backgroundColor: colors[getColorScheme()].backgroundSecondary,
       alignItems: "center",
       padding: 20,
     },
@@ -134,6 +134,10 @@ export default ({ navigation }: any) => {
       color: colors[getColorScheme()].font.accent,
     },
 
+    setting: {
+      fontSize: 16,
+      marginLeft: 10,
+    },
     settings: {
       width: "100%",
       marginTop: 20,
@@ -155,7 +159,7 @@ export default ({ navigation }: any) => {
     },
     icon: {
       fontSize: 20,
-      color: colors[getColorScheme()].font.primary,
+      color: colors[getColorScheme()].font.accent,
       marginRight: 5,
     },
   });
@@ -164,15 +168,16 @@ export default ({ navigation }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Settings</Text>
-
-      <Image
-        style={styles.profilePic}
-        source={
-          profilePic
-            ? { uri: profilePic }
-            : require("../../../assets/profile.jpg")
-        }
-      />
+      <TouchableOpacity onPress={chooseProfilePic}>
+        <Image
+          style={styles.profilePic}
+          source={
+            profilePic
+              ? { uri: profilePic }
+              : require("../../../assets/profile.jpg")
+          }
+        />
+      </TouchableOpacity>
 
       <TouchableOpacity onPress={chooseProfilePic}>
         <Text style={[styles.text, styles.edit]}>Edit</Text>
@@ -187,8 +192,8 @@ export default ({ navigation }: any) => {
       <View style={styles.settings}>
         <TouchableOpacity onPress={() => navigation.navigate("EditProfile")}>
           <View style={styles.element}>
-            <Ionicons name="ios-settings" style={styles.icon} />
-            <Text style={styles.text}>Edit profile</Text>
+            <Ionicons name="ios-settings-sharp" style={styles.icon} />
+            <Text style={[styles.text, styles.setting]}>Edit profile</Text>
           </View>
         </TouchableOpacity>
 
@@ -197,7 +202,7 @@ export default ({ navigation }: any) => {
         <TouchableOpacity onPress={() => navigation.navigate("Welcome")}>
           <View style={styles.element}>
             <Ionicons name="ios-shield-checkmark" style={styles.icon} />
-            <Text style={styles.text}>About this app</Text>
+            <Text style={[styles.text, styles.setting]}>About this app</Text>
           </View>
         </TouchableOpacity>
 
@@ -205,8 +210,8 @@ export default ({ navigation }: any) => {
 
         <TouchableOpacity onPress={UserQueries.userSignOut}>
           <View style={styles.element}>
-            <Ionicons name="ios-exit-outline" style={styles.icon} />
-            <Text style={styles.text}>Log out</Text>
+            <Ionicons name="ios-exit" style={styles.icon} />
+            <Text style={[styles.text, styles.setting]}>Log out</Text>
           </View>
         </TouchableOpacity>
       </View>
