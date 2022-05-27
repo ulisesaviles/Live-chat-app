@@ -32,7 +32,7 @@ export const ProfileModal = ({ route }: any): JSX.Element => {
   const [user, setUser]: User | any = useState({});
   const [me, setMe]: User | any = useState({});
   const userId = route.params.userId;
-  const navigation = useNavigation();
+  const navigation: any = useNavigation();
 
   // Helpers
   const getColorScheme = () => {
