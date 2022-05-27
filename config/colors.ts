@@ -1,12 +1,13 @@
 export default {
   dark: {
     background: "rgb(6,12,16)",
+    backgroundSecondary: "rgb(6,12,16)",
     card: "rgb(18, 25, 32)",
     font: {
       primary: "rgb(251, 251, 251)",
       secondary: "rgb(180, 180, 180)",
       accent: "rgb(45, 112, 243)",
-      danger: "rgb(242, 98, 73)"
+      danger: "rgb(242, 98, 73)",
     },
     input: {
       background: "rgb(31, 38, 43)",
@@ -34,12 +35,13 @@ export default {
   },
   light: {
     background: "rgb(255,255,255)",
+    backgroundSecondary: "rgb(245,245,245)",
     card: "rgb(255,255,255)",
     font: {
       primary: "rgb(0, 0, 0)",
       secondary: "rgb(125, 125, 125)",
       accent: "rgb(45, 112, 243)",
-      danger: "rgb(243, 55, 45)"
+      danger: "rgb(243, 55, 45)",
     },
     input: {
       background: "rgb(241, 241, 241)",
