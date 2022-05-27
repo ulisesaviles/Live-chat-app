@@ -1,32 +1,38 @@
 import { useEffect, useState } from "react";
-import { 
+import {
   View,
   Modal,
   Image,
   StyleSheet,
   Appearance,
   Dimensions,
-  SafeAreaView, 
+  SafeAreaView,
   Text,
   TouchableOpacity,
-  useColorScheme } from "react-native";
+  useColorScheme,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
-//User queries
-import * as UserQueries from '../../db/users'; 
+// User queries
+import * as UserQueries from "../../db/users";
 
 //Icons
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
 
+// Local imports
 import colors from "../../config/colors";
 import { ColorSchemeType } from "../../types";
 import { User } from "../../interfaces";
+import { getData } from "../../config/asyncStorage";
 
-export const ProfileModal = ({route}:any): JSX.Element => {
+export const ProfileModal = ({ route }: any): JSX.Element => {
   // Constants
   const [colorScheme, setColorScheme] = useState(useColorScheme());
   const [firstLoad, setFirstLoad] = useState(true);
   const [user, setUser]: User | any = useState({});
+  const [me, setMe]: User | any = useState({});
   const userId = route.params.userId;
+  const navigation = useNavigation();
 
   // Helpers
   const getColorScheme = () => {
@@ -35,11 +41,12 @@ export const ProfileModal = ({route}:any): JSX.Element => {
     return tempColorScheme;
   };
 
-  const handleFirstLoad = () => {
+  const handleFirstLoad = async () => {
     setFirstLoad(false);
     Appearance.addChangeListener(() => {
       setColorScheme(Appearance.getColorScheme());
     });
+    setMe(await getData("user", true));
   };
 
   //Functions
@@ -47,10 +54,15 @@ export const ProfileModal = ({route}:any): JSX.Element => {
     try {
       const userDoc = await UserQueries.getUserDoc(userId);
       setUser(userDoc);
-    }
-    catch(error) {
+    } catch (error) {
       console.log(error);
     }
+  };
+
+  const removeFriend = async () => {
+    await UserQueries.removeFriend(user.userId!, me.userId!);
+    navigation.goBack();
+    setTimeout(() => navigation.navigate("home"), 100);
   };
 
   const styles = StyleSheet.create({
@@ -59,11 +71,11 @@ export const ProfileModal = ({route}:any): JSX.Element => {
       backgroundColor: colors[getColorScheme()].background,
       borderRadius: 10,
       padding: 10,
-      elevation: 1
+      elevation: 1,
     },
     image: {
-      width: Dimensions.get('screen').width,
-      height: Dimensions.get('screen').height,
+      width: Dimensions.get("screen").width,
+      height: Dimensions.get("screen").height,
       borderRadius: 10,
       backgroundColor: colors[getColorScheme()].card,
     },
@@ -85,13 +97,13 @@ export const ProfileModal = ({route}:any): JSX.Element => {
       width: 150,
       height: 150,
       borderRadius: 1000,
-      marginBottom: 5
+      marginBottom: 5,
     },
     name: {
       fontSize: 20,
       fontWeight: "500",
       color: colors[getColorScheme()].font.primary,
-      marginBottom: 5
+      marginBottom: 5,
     },
     userId: {
       fontWeight: "500",
@@ -99,32 +111,32 @@ export const ProfileModal = ({route}:any): JSX.Element => {
     },
 
     settings: {
-      width: '100%',
+      width: "100%",
       marginTop: 20,
       borderRadius: 20,
       padding: 16,
       backgroundColor: colors[getColorScheme()].card,
     },
     element: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
     },
     divider: {
-      width: '100%',
+      width: "100%",
       borderBottomWidth: 1,
       borderBottomColor: colors[getColorScheme()].font.primary,
       opacity: 0.1,
       marginTop: 10,
-      marginBottom: 10
+      marginBottom: 10,
     },
     icon: {
       fontSize: 20,
       color: colors[getColorScheme()].font.primary,
-      marginRight: 5
+      marginRight: 5,
     },
-    danger : {
-      color: colors[getColorScheme()].font.danger
-    }
+    danger: {
+      color: colors[getColorScheme()].font.danger,
+    },
   });
 
   // On refresh
@@ -132,36 +144,53 @@ export const ProfileModal = ({route}:any): JSX.Element => {
     if (firstLoad) {
       handleFirstLoad();
     }
-    if (userId !== '') {
+    if (userId !== "") {
       getUser();
     }
   }, [userId]);
 
-  return(
-      <>
-      {
-        userId !== ''
-        &&
+  return (
+    <>
+      {userId !== "" && (
         <SafeAreaView style={styles.container}>
-          <View style={{padding: 20, flex: 1, width: '100%', alignItems: 'center'}}>
-            <Image style={styles.profilePic} source={user.pictureUrl ? {uri: user.pictureUrl} : require('../../assets/profile.jpg')} />
+          <View
+            style={{
+              padding: 20,
+              flex: 1,
+              width: "100%",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              style={styles.profilePic}
+              source={
+                user.pictureUrl
+                  ? { uri: user.pictureUrl }
+                  : require("../../assets/profile.jpg")
+              }
+            />
             <TouchableOpacity>
-              <Text style={styles.name} >{user?.name}</Text>
+              <Text style={styles.name}>{user?.name}</Text>
             </TouchableOpacity>
 
-            <Text style={[styles.text, styles.userId]} >@{user?.userName}</Text>
+            <Text style={[styles.text, styles.userId]}>@{user?.userName}</Text>
 
-            <View style={styles.settings} >    
-              <TouchableOpacity>
-                <View style={styles.element} >
-                  <Ionicons name="ios-remove-circle" style={[styles.icon, styles.danger]} />
-                  <Text style={[styles.text, styles.danger]} >Remove friend</Text>
+            <View style={styles.settings}>
+              <TouchableOpacity onPress={removeFriend}>
+                <View style={styles.element}>
+                  <Ionicons
+                    name="ios-remove-circle"
+                    style={[styles.icon, styles.danger]}
+                  />
+                  <Text style={[styles.text, styles.danger]}>
+                    Remove friend
+                  </Text>
                 </View>
               </TouchableOpacity>
             </View>
           </View>
         </SafeAreaView>
-      }
-      </>
-  )
-}
+      )}
+    </>
+  );
+};
