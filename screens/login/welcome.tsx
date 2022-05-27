@@ -74,7 +74,7 @@ export default () => {
       flex: 1,
     },
     featureTitle: {
-      color: colors[colorScheme!].font.accent,
+      color: colors[colorScheme!].font.primary,
       fontSize: 22,
       fontWeight: "600",
     },

@@ -5,8 +5,8 @@ import {
   useColorScheme,
   View,
   Text,
-  TouchableOpacity,
-  SafeAreaView
+  Dimensions,
+  SafeAreaView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -15,7 +15,7 @@ import colors from "../../../config/colors";
 import { ColorSchemeType } from "../../../types";
 
 //Icons
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
 
 //Components
 import { Input } from "../../../components/input";
@@ -24,13 +24,16 @@ import { Button } from "../../../components/button";
 // Queries
 import * as UserQueries from "../../../db/users";
 import { getData, setData } from "../../../config/asyncStorage";
-import { User } from "../../../interfaces";
 
 export default () => {
   const [colorScheme, setColorScheme] = useState(useColorScheme());
   const [firstLoad, setFirstLoad] = useState(true);
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const navigation = useNavigation<any>();
+  const dimensions = {
+    width: Dimensions.get("screen").width,
+    height: Dimensions.get("screen").height,
+  };
 
   // Helpers
   const getColorScheme = () => {
@@ -49,18 +52,22 @@ export default () => {
   // Functions
   const onChangeName = (value: string) => {
     setName(value);
-  }
+  };
 
-  const changeName = async() => {
-    if(name !== '') {
-      const user: any = await getData('user', true);
-      const updatedUser = await UserQueries.updateUser(user.userId, {name}, true);
+  const changeName = async () => {
+    if (name !== "") {
+      const user: any = await getData("user", true);
+      const updatedUser = await UserQueries.updateUser(
+        user.userId,
+        { name },
+        true
+      );
       if (updatedUser) {
-        setData(updatedUser, 'user');
+        setData(updatedUser, "user");
       }
-      navigation.navigate('Profile', {needsToReload: true});
+      navigation.navigate("Profile", { needsToReload: true });
     }
-  }
+  };
 
   // On refresh
   useEffect(() => {
@@ -71,11 +78,17 @@ export default () => {
 
   //Styles
   const styles = StyleSheet.create({
+    backArrow: {
+      marginRight: 15,
+      fontSize: 22,
+      position: "absolute",
+      left: dimensions.width * 0.06,
+    },
     container: {
       flex: 1,
-      backgroundColor: colors[getColorScheme()].background,
+      backgroundColor: colors[getColorScheme()].backgroundSecondary,
       alignItems: "center",
-      padding: 20
+      paddingHorizontal: 20,
     },
     text: {
       fontSize: 14,
@@ -83,52 +96,62 @@ export default () => {
     },
     title: {
       fontWeight: "600",
-      fontSize: 18,
+      fontSize: 22,
       marginBottom: 20,
-      marginTop: 20,
+      marginTop: 15,
       color: colors[getColorScheme()].font.primary,
     },
 
     header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center'
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: dimensions.width * 0.05,
+      width: dimensions.width,
+      marginBottom: 20,
     },
 
+    setting: {
+      fontSize: 16,
+      marginLeft: 10,
+    },
     settings: {
-      width: '100%',
-      marginTop: 20,
+      width: "100%",
+      marginTop: 10,
       borderRadius: 20,
       padding: 16,
       backgroundColor: colors[getColorScheme()].card,
     },
     element: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
     },
     divider: {
-      width: '100%',
+      width: "100%",
       borderBottomWidth: 1,
       borderBottomColor: colors[getColorScheme()].font.primary,
       opacity: 0.1,
       marginTop: 10,
-      marginBottom: 10
+      marginBottom: 10,
     },
     icon: {
       fontSize: 20,
-      color: colors[getColorScheme()].font.primary,
-      marginRight: 5
-    }
+      color: colors[getColorScheme()].font.accent,
+      marginRight: 5,
+    },
   });
 
   //React component
 
   return (
-    <SafeAreaView style={styles.container} >
-
-      <View style={styles.header} >
-        <Ionicons name="ios-arrow-back" style={styles.icon} onPress={() => navigation.goBack()} />
-        <Text style={styles.title} >Change name</Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Ionicons
+          name="ios-arrow-back"
+          style={[styles.icon, styles.backArrow]}
+          onPress={() => navigation.goBack()}
+        />
+        <Text style={styles.title}>Change name</Text>
       </View>
 
       <Input
@@ -136,11 +159,11 @@ export default () => {
         label="New name"
         placeholder="type your name"
         onChangeText={onChangeName}
-        secureTextEntry={false}  />
+        secureTextEntry={false}
+      />
+      <View style={{ height: 5 }} />
 
-      
-      <Button type="gradient" value="Change name" onPress={changeName}/>
-
+      <Button type="gradient" value="Change name" onPress={changeName} />
     </SafeAreaView>
-  )
-}
+  );
+};

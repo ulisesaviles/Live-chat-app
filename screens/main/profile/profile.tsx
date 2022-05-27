@@ -10,14 +10,14 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from "expo-image-picker";
 
 // Theme
 import colors from "../../../config/colors";
 import { ColorSchemeType } from "../../../types";
 
 //Icons
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
 
 // User queries
 import * as UserQueries from "../../../db/users";
@@ -28,12 +28,12 @@ import { User } from "../../../interfaces";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 // Default react component
-export default ({navigation}: any) => {
+export default ({ navigation }: any) => {
   // Constants
   const [colorScheme, setColorScheme] = useState(useColorScheme());
   const [firstLoad, setFirstLoad] = useState(true);
   const [user, setUser] = useState<User | null>(null);
-  const [profilePic, setPic] = useState('');
+  const [profilePic, setPic] = useState("");
 
   // Helpers
   const getColorScheme = () => {
@@ -52,30 +52,28 @@ export default ({navigation}: any) => {
   // Functions
   const getUser = async () => {
     try {
-      const currentUser: any = await getData('user', true);
+      const currentUser: any = await getData("user", true);
       setUser(currentUser);
       if (currentUser.pictureUrl) {
         setPic(currentUser.pictureUrl);
       }
-    }
-    catch(error) {
+    } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const chooseProfilePic = async () => {
     let res = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
-      quality: 1
+      quality: 1,
     });
-
 
     if (!res.cancelled) {
       UserQueries.changeProfilePic(user?.userId!, res.uri);
       setPic(res.uri);
     }
-  }
+  };
 
   // On refresh
   useEffect(() => {
@@ -83,22 +81,22 @@ export default ({navigation}: any) => {
       handleFirstLoad();
       getUser();
     }
-    const unsubscribe = navigation.addListener('focus', () => {
+    const unsubscribe = navigation.addListener("focus", () => {
       getUser();
     });
 
-    return() => {
+    return () => {
       unsubscribe;
-    }
+    };
   }, [navigation]);
 
   // Styles
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors[getColorScheme()].background,
+      backgroundColor: colors[getColorScheme()].backgroundSecondary,
       alignItems: "center",
-      padding: 20
+      padding: 20,
     },
     loading: {
       color: colors[getColorScheme()].font.primary,
@@ -118,95 +116,105 @@ export default ({navigation}: any) => {
       width: 150,
       height: 150,
       borderRadius: 1000,
-      marginBottom: 5
+      marginBottom: 5,
     },
     edit: {
       fontSize: 12,
       fontWeight: "600",
-      marginBottom: 15
+      marginBottom: 15,
     },
     name: {
       fontSize: 20,
       fontWeight: "500",
       color: colors[getColorScheme()].font.primary,
-      marginBottom: 5
+      marginBottom: 5,
     },
     userId: {
       fontWeight: "500",
       color: colors[getColorScheme()].font.accent,
     },
 
+    setting: {
+      fontSize: 16,
+      marginLeft: 10,
+    },
     settings: {
-      width: '100%',
+      width: "100%",
       marginTop: 20,
       borderRadius: 20,
       padding: 16,
       backgroundColor: colors[getColorScheme()].card,
     },
     element: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
     },
     divider: {
-      width: '100%',
+      width: "100%",
       borderBottomWidth: 1,
       borderBottomColor: colors[getColorScheme()].font.primary,
       opacity: 0.1,
       marginTop: 10,
-      marginBottom: 10
+      marginBottom: 10,
     },
     icon: {
       fontSize: 20,
-      color: colors[getColorScheme()].font.primary,
-      marginRight: 5
-    }
+      color: colors[getColorScheme()].font.accent,
+      marginRight: 5,
+    },
   });
 
   // React component
   return (
     <SafeAreaView style={styles.container}>
-
-      <Text style={styles.title} >Settings</Text>
-
-      <Image style={styles.profilePic} source={profilePic ? {uri: profilePic} : require('../../../assets/profile.jpg')} />
+      <Text style={styles.title}>Settings</Text>
+      <TouchableOpacity onPress={chooseProfilePic}>
+        <Image
+          style={styles.profilePic}
+          source={
+            profilePic
+              ? { uri: profilePic }
+              : require("../../../assets/profile.jpg")
+          }
+        />
+      </TouchableOpacity>
 
       <TouchableOpacity onPress={chooseProfilePic}>
-        <Text style={[styles.text, styles.edit]} >Edit</Text>
+        <Text style={[styles.text, styles.edit]}>Edit</Text>
       </TouchableOpacity>
-
 
       <TouchableOpacity>
-        <Text style={styles.name} >{user?.name}</Text>
+        <Text style={styles.name}>{user?.name}</Text>
       </TouchableOpacity>
 
-      <Text style={[styles.text, styles.userId]} >@{user?.userName}</Text>
+      <Text style={[styles.text, styles.userId]}>@{user?.userName}</Text>
 
-        <View style={styles.settings} >
-          <TouchableOpacity onPress={() => navigation.navigate("EditProfile")}>
-            <View style={styles.element} >
-              <Ionicons name="ios-settings" style={styles.icon} />
-              <Text style={styles.text} >Edit profile</Text>
-            </View>
-          </TouchableOpacity>
+      <View style={styles.settings}>
+        <TouchableOpacity onPress={() => navigation.navigate("EditProfile")}>
+          <View style={styles.element}>
+            <Ionicons name="ios-settings-sharp" style={styles.icon} />
+            <Text style={[styles.text, styles.setting]}>Edit profile</Text>
+          </View>
+        </TouchableOpacity>
 
-          <View style={styles.divider} ></View>
-          
-          <TouchableOpacity>
-            <View style={styles.element} >
-              <Ionicons name="ios-shield-checkmark" style={styles.icon} />
-              <Text style={styles.text} >About this app</Text>
-            </View>
-          </TouchableOpacity>
+        <View style={styles.divider}></View>
 
-          <View style={styles.divider} ></View>
+        <TouchableOpacity onPress={() => navigation.navigate("Welcome")}>
+          <View style={styles.element}>
+            <Ionicons name="ios-shield-checkmark" style={styles.icon} />
+            <Text style={[styles.text, styles.setting]}>About this app</Text>
+          </View>
+        </TouchableOpacity>
 
-          <TouchableOpacity onPress={UserQueries.userSignOut}>
-            <View style={styles.element} >
-              <Ionicons name="ios-exit-outline" style={styles.icon} />
-              <Text style={styles.text} >Log out</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+        <View style={styles.divider}></View>
+
+        <TouchableOpacity onPress={UserQueries.userSignOut}>
+          <View style={styles.element}>
+            <Ionicons name="ios-exit" style={styles.icon} />
+            <Text style={[styles.text, styles.setting]}>Log out</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };

@@ -40,18 +40,21 @@ export default () => {
   const [colorScheme, setColorScheme] = useState(useColorScheme());
   const [firstLoad, setFirstLoad] = useState(true);
   const navigation = useNavigation<any>();
-  const [user, setUser]: [User, any] = useState(null);
-  const [users, setUsers]: [User[], any] = useState(null);
-  const [searchResults, setSearchResults]: [User[], any] = useState(null);
+  const [user, setUser]: [User | any, any] = useState(null);
+  const [users, setUsers]: [User[] | null, any] = useState(null);
+  const [searchResults, setSearchResults]: [User[] | any, any] = useState(null);
   const [input, setInput]: [string, any] = useState("");
   const dimensions = {
     height: Dimensions.get("screen").height,
     width: Dimensions.get("screen").width,
   };
-  const [selectedUser, setSelectedUser]: {
-    id: null | string;
-    state: null | string;
-  } = useState({
+  const [selectedUser, setSelectedUser]: [
+    {
+      id: any | string;
+      state: any | string;
+    },
+    any
+  ] = useState({
     id: null,
     state: null,
   });
@@ -65,12 +68,12 @@ export default () => {
 
   const getUsers = async () => {
     // Get user
-    const user: User = (await getData("user", true))!;
+    const user: User | null = (await getData("user", true))!;
     setUser(user);
 
     // Get users
     let users = await UserQueries.getAllUsers();
-    users = onlyUnknownUsers(user, users!);
+    users = onlyUnknownUsers(user!, users!);
 
     // Set them
     setSearchResults(users);
@@ -91,7 +94,7 @@ export default () => {
 
     // Perform search
     value = value.trim().toLowerCase();
-    let tempUsers = [...users];
+    let tempUsers = [...users!];
     let tempSearchResults: User[] = [];
     for (let i = 0; i < tempUsers.length; i++) {
       const user = tempUsers[i];
@@ -219,7 +222,7 @@ export default () => {
           <View style={styles.loadingContainer}>
             <Text style={styles.loading}>Loading users...</Text>
           </View>
-        ) : users?.length === 0 ? (
+        ) : users.length === 0 ? (
           // No users
           <View style={styles.loadingContainer}>
             <Text style={styles.loading}>There are no new users yet😒</Text>
@@ -238,7 +241,7 @@ export default () => {
             <ScrollView>
               <View style={styles.invisibleHeader} />
               {
-                searchResults.map((user_) => (
+                searchResults.map((user_: User) => (
                   <View key={user_.userId}>
                     {user_.userId === user.userId ||
                     user.friendsIds?.includes(user_.userId!) ? null : (
